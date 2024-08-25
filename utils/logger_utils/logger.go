@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"teasutils/utils/settings_utils"
+	"github.com/teadove/teasutils/utils/settings_utils"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"

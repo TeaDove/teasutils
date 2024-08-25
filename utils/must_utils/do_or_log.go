@@ -3,7 +3,7 @@ package must_utils
 import (
 	"context"
 
-	"teasutils/utils/refrect_utils"
+	"github.com/teadove/teasutils/utils/refrect_utils"
 
 	"github.com/rs/zerolog"
 )

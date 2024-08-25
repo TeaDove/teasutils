@@ -6,7 +6,7 @@ import (
 	"runtime/metrics"
 	"time"
 
-	"teasutils/utils/converters_utils"
+	"github.com/teadove/teasutils/utils/converters_utils"
 
 	"github.com/rs/zerolog"
 )
