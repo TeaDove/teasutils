@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func DoOrLog(f func(ctx context.Context) error) func(ctx context.Context) {
+func DoOrLog(f func(ctx context.Context) error, errorMsg string) func(ctx context.Context) {
 	return func(ctx context.Context) {
 		err := f(ctx)
 		if err != nil {
@@ -16,7 +16,7 @@ func DoOrLog(f func(ctx context.Context) error) func(ctx context.Context) {
 				Error().
 				Err(err).
 				Str("func_name", refrect_utils.GetFunctionName(f)).
-				Msg("do.failed")
+				Msg(errorMsg)
 		}
 	}
 }
