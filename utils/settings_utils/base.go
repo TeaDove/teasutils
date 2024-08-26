@@ -50,11 +50,9 @@ func InitSetting[T any](ctx context.Context, omitFromLogValues ...string) (T, er
 		}
 	}
 
-	println(string(settingsJson))
-
 	zerolog.Ctx(ctx).
 		Debug().
-		Interface("v", settings).
+		RawJSON("v", settingsJson).
 		Msg("settings.loaded")
 
 	return settings, nil
