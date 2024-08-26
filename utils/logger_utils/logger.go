@@ -24,7 +24,22 @@ func WithStrContextLog(ctx context.Context, key string, value string) context.Co
 	return zerolog.Ctx(ctx).With().Str(key, value).Ctx(ctx).Logger().WithContext(ctx)
 }
 
-func humanMarshalStack(err error) interface{} {
+//func humanMarshalStack(err error) interface{} {
+//	type stackTracer interface {
+//		StackTrace() errors.StackTrace
+//	}
+//	e, ok := err.(stackTracer)
+//	if !ok {
+//		return nil
+//	}
+//
+//	for _, frame := range e.StackTrace() {
+//		fmt.Printf("%+s:%d\r\n", frame, frame)
+//	}
+//	return nil
+//}
+
+func humanMarshalStack(err error) any {
 	type stackTracer interface {
 		StackTrace() errors.StackTrace
 	}
@@ -32,14 +47,17 @@ func humanMarshalStack(err error) interface{} {
 	if !ok {
 		return nil
 	}
-	// It's mean when env=dev just print track
-	for _, frame := range e.StackTrace() {
-		fmt.Printf("%+s:%d\r\n", frame, frame)
+
+	stack := e.StackTrace()
+	formatted := ""
+	for _, frame := range stack {
+		formatted += fmt.Sprintf("%+v\n", frame)
 	}
-	return nil
+	return formatted
 }
 
 func initLogger(settings *settings) {
+	// zerolog.ErrorStackMarshaler = humanMarshalStack
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
 	level, err := zerolog.ParseLevel(settings.LogLevel)
@@ -68,7 +86,7 @@ func initLogger(settings *settings) {
 	logger.Trace().Str("log.level", level.String()).Msg("logger.initiated")
 }
 
-var globalLogger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+var globalLogger = zerolog.Logger{}
 
 func init() {
 	type BaseSettings struct {

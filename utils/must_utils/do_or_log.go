@@ -20,3 +20,20 @@ func DoOrLog(f func(ctx context.Context) error, errorMsg string) func(ctx contex
 		}
 	}
 }
+
+func DoOrLogWithStacktrace(
+	f func(ctx context.Context) error,
+	errorMsg string,
+) func(ctx context.Context) {
+	return func(ctx context.Context) {
+		err := f(ctx)
+		if err != nil {
+			zerolog.Ctx(ctx).
+				Error().
+				Stack().
+				Err(err).
+				Str("func_name", refrect_utils.GetFunctionName(f)).
+				Msg(errorMsg)
+		}
+	}
+}
