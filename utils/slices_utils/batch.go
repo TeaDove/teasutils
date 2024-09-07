@@ -18,12 +18,12 @@ func CutInBatches[T any](slice []T, batchSize int) [][]T {
 	batches := make([][]T, 0, len(slice)/batchSize)
 
 	var i int
-	for i = range len(slice) / batchSize {
+	for i = 0; i < len(slice)/batchSize; i++ {
 		batches = append(batches, slice[i*batchSize:(i+1)*batchSize])
 	}
 
-	if (i+1)*batchSize < len(slice) {
-		batches = append(batches, slice[(i+1)*batchSize:])
+	if (i)*batchSize < len(slice) {
+		batches = append(batches, slice[(i)*batchSize:])
 	}
 
 	return batches
