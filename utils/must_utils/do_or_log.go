@@ -8,7 +8,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func DoOrLog(f func(ctx context.Context) error, errorMsg string) func(ctx context.Context) {
+func DoOrLog(
+	f func(ctx context.Context) error,
+	errorMsg string,
+) func(ctx context.Context) {
 	return func(ctx context.Context) {
 		err := f(ctx)
 		if err != nil {
