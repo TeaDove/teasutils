@@ -3,13 +3,13 @@ package logger_utils
 import (
 	"context"
 	"fmt"
+	"github.com/teadove/teasutils/utils/must_utils"
 	"os"
 
 	"github.com/teadove/teasutils/utils/settings_utils"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 func NewLoggedCtx() context.Context {
@@ -44,16 +44,7 @@ func humanMarshalStack(err error) any {
 func initLogger(settings *settings) {
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
-	level, err := zerolog.ParseLevel(settings.LogLevel)
-	if err != nil {
-		log.Error().
-			Stack().
-			Err(err).
-			Str("decision", "debug.will.be.used").
-			Msg("invalid.log.level")
-
-		level = zerolog.DebugLevel
-	}
+	level := must_utils.MustNoCtx(zerolog.ParseLevel(settings.LogLevel))
 
 	logger := zerolog.New(os.Stderr).
 		With().
