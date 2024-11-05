@@ -30,7 +30,6 @@ const (
 //	 func init() {
 //		  ctx := logger_utils.NewLoggedCtx()
 //
-//		  var err error
 //		  Settings = must_utils.Must(settings_utils.InitSetting[baseSettings](
 //		  	  ctx,
 //		  	  "tg.token",

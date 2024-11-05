@@ -44,7 +44,7 @@ func humanMarshalStack(err error) any {
 func initLogger(settings *settings) {
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
-	level := must_utils.MustNoCtx(zerolog.ParseLevel(settings.LogLevel))
+	level := must_utils.Must(zerolog.ParseLevel(settings.LogLevel))
 
 	logger := zerolog.New(os.Stderr).
 		With().
