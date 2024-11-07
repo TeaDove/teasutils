@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -12,6 +11,8 @@ import (
 	"github.com/teadove/teasutils/utils/redact_utils"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+	"os"
+	"syscall"
 )
 
 const (
@@ -39,6 +40,8 @@ const (
 //		 }
 //
 //		 var Settings baseSettings
+//
+// Panics if dotEnv file found, but corrupted.
 func InitSetting[T any](
 	ctx context.Context,
 	envPrefix string,
@@ -46,7 +49,10 @@ func InitSetting[T any](
 ) (T, error) {
 	err := godotenv.Load(envFile)
 	if err != nil {
-		println(fmt.Sprintf("failed to load .env file %v", err))
+		var pathErr *os.PathError
+		if !(errors.As(err, &pathErr) && errors.Is(pathErr.Err, syscall.ENOENT)) {
+			panic(fmt.Sprintf("failed to load dotenv file %s: %v", envFile, err))
+		}
 	}
 
 	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
