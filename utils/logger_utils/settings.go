@@ -3,7 +3,7 @@ package logger_utils
 type settings struct {
 	// Level
 	// Can be trace, debug, info, warning, error etc.
-	Level string `env:"level" envDefault:"DEBUG"`
+	Level string `env:"level" envDefault:"INFO"`
 
 	// Factory
 	// Zerolog factory, can be console (with fancy colors ✨🪄🔮💫) or json (⚙️)

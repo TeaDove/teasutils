@@ -43,10 +43,10 @@ func humanMarshalStack(err error) any {
 	return formatted
 }
 
-func initGlobalLogger(settings *settings) {
+func makeLogger(loggerSettings *settings) zerolog.Logger {
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
-	level := must_utils.Must(zerolog.ParseLevel(settings.Level))
+	level := must_utils.Must(zerolog.ParseLevel(loggerSettings.Level))
 
 	logger := zerolog.New(os.Stderr).
 		With().
@@ -55,21 +55,22 @@ func initGlobalLogger(settings *settings) {
 		Logger().
 		Level(level)
 
-	if strings.EqualFold(settings.Factory, "CONSOLE") {
+	if strings.EqualFold(loggerSettings.Factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 	}
 
-	globalLogger = logger
-	logger.Trace().Str("log.level", level.String()).Msg("logger.initiated")
+	logger.Trace().Str("logLevel", level.String()).Msg("logger.initiated")
+
+	return logger
 }
 
-var globalLogger = zerolog.Logger{}
-
-func init() {
+func makeLoggerFromSettings() zerolog.Logger {
 	loggerSettings, err := settings_utils.InitSetting[settings](context.Background(), "log_")
 	if err != nil {
 		panic(errors.Wrap(err, "failed to init base settings"))
 	}
 
-	initGlobalLogger(&loggerSettings)
+	return makeLogger(&loggerSettings)
 }
+
+var globalLogger = makeLoggerFromSettings()

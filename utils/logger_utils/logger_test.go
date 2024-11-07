@@ -20,7 +20,7 @@ func TestUnit_LoggerUtils_ErrorWithStackrace_Ok(t *testing.T) {
 func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
 	t.Parallel()
 
-	initGlobalLogger(&settings{
+	logger := makeLogger(&settings{
 		Level:   "DEBUG",
 		Factory: "JSON",
 	})
@@ -29,6 +29,8 @@ func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
 	ctx := NewLoggedCtx()
 
 	ctx = WithStrContextLog(ctx, "userId", "123")
+
+	ctx = logger.WithContext(ctx)
 
 	zerolog.Ctx(ctx).Error().Stack().Err(err).Msg("error")
 }
