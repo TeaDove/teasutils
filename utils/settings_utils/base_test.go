@@ -24,3 +24,27 @@ func TestUnit_Settings_Init_Ok(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 }
+
+func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
+	t.Parallel()
+
+	type Settings struct {
+		User     string `env:"user"     envDefault:"masha"               json:"user"`
+		Password string `env:"password" envDefault:"thebestpasswordever" json:"password"`
+	}
+
+	_ = os.Remove(envFile)
+
+	file, err := os.Create(envFile)
+	require.NoError(t, err)
+
+	_, err = file.WriteString(`teas_user=julia`)
+	require.NoError(t, err)
+
+	settings, err := InitSetting[Settings](context.Background(), "teas_", "password")
+	assert.NoError(t, err)
+	assert.Equal(t, "julia", settings.User)
+
+	err = os.Remove(envFile)
+	require.NoError(t, err)
+}

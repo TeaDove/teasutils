@@ -3,6 +3,7 @@ package settings_utils
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
@@ -43,7 +44,10 @@ func InitSetting[T any](
 	envPrefix string,
 	omitFromLogValues ...string,
 ) (T, error) {
-	_ = godotenv.Load(envFile)
+	err := godotenv.Load(envFile)
+	if err != nil {
+		println(fmt.Sprintf("failed to load .env file %v", err))
+	}
 
 	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
 	if err != nil {
