@@ -20,7 +20,7 @@ func TestUnit_Settings_Init_Ok(t *testing.T) {
 	err := os.Setenv("teas_user", "julia")
 	require.NoError(t, err)
 
-	settings, err := InitSetting[Settings](context.Background(), "password")
+	settings, err := InitSetting[Settings](context.Background(), "teas_", "password")
 	assert.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 }

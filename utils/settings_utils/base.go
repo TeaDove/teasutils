@@ -3,6 +3,7 @@ package settings_utils
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -13,34 +14,38 @@ import (
 )
 
 const (
-	defaultEnvPrefix = "teas_"
-	defaultEnvFile   = ".env"
+	envFile = ".env"
 )
 
 // InitSetting
 // Initialize settings, example:
 //
-//	 type tg struct {
-//	   Token string `env:"token,required" json:"token"`
-//	 }
+//		 type tg struct {
+//		   Token string `env:"token,required" json:"token"`
+//		 }
 //
-//	 type baseSettings struct {
-//		Tg  tg  `env:"tg"  json:"tg"  envPrefix:"tg__"`
-//	 }
-//	 func init() {
-//		  ctx := logger_utils.NewLoggedCtx()
+//		 type baseSettings struct {
+//			Tg  tg  `env:"tg"  json:"tg"  envPrefix:"tg__"`
+//		 }
+//		 func init() {
+//			  ctx := logger_utils.NewLoggedCtx()
 //
-//		  Settings = must_utils.Must(settings_utils.InitSetting[baseSettings](
-//		  	  ctx,
-//		  	  "tg.token",
-//		  ))
-//	 }
+//			  Settings = must_utils.Must(settings_utils.InitSetting[baseSettings](
+//			  	  ctx,
+//	           "teas_",
+//			  	  "tg.token",
+//			  ))
+//		 }
 //
-//	 var Settings baseSettings
-func InitSetting[T any](ctx context.Context, omitFromLogValues ...string) (T, error) {
-	_ = godotenv.Load(defaultEnvFile)
+//		 var Settings baseSettings
+func InitSetting[T any](
+	ctx context.Context,
+	envPrefix string,
+	omitFromLogValues ...string,
+) (T, error) {
+	_ = godotenv.Load(envFile)
 
-	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: defaultEnvPrefix})
+	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
 	if err != nil {
 		return *new(T), errors.Wrap(err, "failed to env parse")
 	}

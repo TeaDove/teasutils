@@ -3,8 +3,10 @@ package logger_utils
 import (
 	"context"
 	"fmt"
-	"github.com/teadove/teasutils/utils/must_utils"
 	"os"
+	"strings"
+
+	"github.com/teadove/teasutils/utils/must_utils"
 
 	"github.com/teadove/teasutils/utils/settings_utils"
 
@@ -41,10 +43,10 @@ func humanMarshalStack(err error) any {
 	return formatted
 }
 
-func initLogger(settings *settings) {
+func initGlobalLogger(settings *settings) {
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
-	level := must_utils.Must(zerolog.ParseLevel(settings.LogLevel))
+	level := must_utils.Must(zerolog.ParseLevel(settings.Level))
 
 	logger := zerolog.New(os.Stderr).
 		With().
@@ -53,7 +55,7 @@ func initLogger(settings *settings) {
 		Logger().
 		Level(level)
 
-	if settings.LoggerFactory == "console" {
+	if strings.EqualFold(settings.Factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 	}
 
@@ -64,14 +66,10 @@ func initLogger(settings *settings) {
 var globalLogger = zerolog.Logger{}
 
 func init() {
-	type BaseSettings struct {
-		Logger settings `envPrefix:"log__"`
-	}
-
-	baseSettings, err := settings_utils.InitSetting[BaseSettings](context.Background())
+	loggerSettings, err := settings_utils.InitSetting[settings](context.Background(), "log_")
 	if err != nil {
 		panic(errors.Wrap(err, "failed to init base settings"))
 	}
 
-	initLogger(&baseSettings.Logger)
+	initGlobalLogger(&loggerSettings)
 }

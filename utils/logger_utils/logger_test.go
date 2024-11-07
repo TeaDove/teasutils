@@ -9,13 +9,33 @@ import (
 )
 
 func TestUnit_LoggerUtils_ErrorWithStackrace_Ok(t *testing.T) {
+	t.Parallel()
+
 	err := errors.WithStack(errors.New("test error"))
 	ctx := NewLoggedCtx()
 
 	zerolog.Ctx(ctx).Error().Stack().Err(err).Msg("error")
 }
 
+func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
+	t.Parallel()
+
+	initGlobalLogger(&settings{
+		Level:   "DEBUG",
+		Factory: "JSON",
+	})
+
+	err := errors.WithStack(errors.New("test error"))
+	ctx := NewLoggedCtx()
+
+	ctx = WithStrContextLog(ctx, "userId", "123")
+
+	zerolog.Ctx(ctx).Error().Stack().Err(err).Msg("error")
+}
+
 func TestUnit_LoggerUtils_Panic_Ok(t *testing.T) {
+	t.Parallel()
+
 	err := errors.WithStack(errors.New("test error"))
 	ctx := NewLoggedCtx()
 
