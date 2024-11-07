@@ -65,7 +65,7 @@ func makeLogger(loggerSettings *settings) zerolog.Logger {
 }
 
 func makeLoggerFromSettings() zerolog.Logger {
-	loggerSettings, err := settings_utils.InitSetting[settings](context.Background(), "log_")
+	loggerSettings, err := settings_utils.InitSetting[settings](context.Background(), "LOG_")
 	if err != nil {
 		panic(errors.Wrap(err, "failed to init base settings"))
 	}
