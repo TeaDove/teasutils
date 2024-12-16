@@ -22,7 +22,7 @@ func LogMemUsage(ctx context.Context) {
 
 	runtime.ReadMemStats(&m)
 
-	zerolog.Ctx(ctx).Info().
+	zerolog.Ctx(ctx).Error().
 		Float64("stop.the.world.ms", converters_utils.ToMega(m.PauseTotalNs)).
 		Float64("heap.alloc.mb", converters_utils.ToMegaByte(m.HeapAlloc)).
 		Float64("cum.heap.alloc.mb", converters_utils.ToMegaByte(m.TotalAlloc)).
