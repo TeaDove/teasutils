@@ -30,6 +30,7 @@ func humanMarshalStack(err error) any {
 	type stackTracer interface {
 		StackTrace() errors.StackTrace
 	}
+
 	e, ok := err.(stackTracer)
 	if !ok {
 		return nil
@@ -37,13 +38,16 @@ func humanMarshalStack(err error) any {
 
 	stack := e.StackTrace()
 	formatted := ""
+
 	for _, frame := range stack {
 		formatted += fmt.Sprintf("%+v\n", frame)
 	}
+
 	return formatted
 }
 
 func makeLogger(loggerSettings *settings) zerolog.Logger {
+	//nolint: reassign // Need this
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
 	level := must_utils.Must(zerolog.ParseLevel(loggerSettings.Level))
@@ -73,4 +77,5 @@ func makeLoggerFromSettings() zerolog.Logger {
 	return makeLogger(&loggerSettings)
 }
 
+//nolint:gochecknoglobals // need this
 var globalLogger = makeLoggerFromSettings()

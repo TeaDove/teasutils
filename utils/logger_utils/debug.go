@@ -8,7 +8,7 @@ import (
 
 // LogAny
 //
-// Logs everything, only for debug purposes
+// Logs everything, only for debug purposes.
 func LogAny(values ...any) {
 	arr := zerolog.Arr()
 	for _, value := range values {

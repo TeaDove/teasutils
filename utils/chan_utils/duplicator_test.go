@@ -1,12 +1,15 @@
 package chan_utils
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUnit_ChanUtils_Duplicator_Ok(t *testing.T) {
+	t.Parallel()
+
 	var wg sync.WaitGroup
 
 	original := make(chan string, 10)

@@ -7,5 +7,4 @@ repos:
   - repo: https://github.com/Bahjat/pre-commit-golang
     rev: v1.0.2
     hooks:
-      - id: go-fmt-import
       - id: gofumpt

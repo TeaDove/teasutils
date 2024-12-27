@@ -15,14 +15,14 @@ func TestUnit_Settings_Init_Ok(t *testing.T) {
 		Password string `env:"password" envDefault:"thebestpasswordever" json:"password"`
 	}
 
-	err := os.Setenv("teas_user", "julia")
-	require.NoError(t, err)
+	t.Setenv("teas_user", "julia")
 
 	settings, err := InitSetting[Settings](context.Background(), "teas_", "password")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 }
 
+//nolint: paralleltest // working with files
 func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 	type Settings struct {
 		User     string `env:"user"     envDefault:"masha"               json:"user"`
@@ -38,13 +38,14 @@ func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 	require.NoError(t, err)
 
 	settings, err := InitSetting[Settings](context.Background(), "teas_", "password")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 
 	err = os.Remove(envFile)
 	require.NoError(t, err)
 }
 
+//nolint: paralleltest // working with files
 func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 	type Settings struct {
 		User     string `env:"user"     envDefault:"masha"               json:"user"`

@@ -29,6 +29,7 @@ func LogMemUsage(ctx context.Context) {
 		Float64("heap.alloc.count.k", converters_utils.ToKilo(m.HeapObjects)).
 		Float64("stack.in.use.mb", converters_utils.ToMegaByte(m.StackInuse)).
 		Float64("total.sys.mb", converters_utils.ToMegaByte(m.Sys)).
+		//nolint: mnd // its percent and precision
 		Float64("gc.cpu.percent", converters_utils.ToFixed(m.GCCPUFraction*100, 4)).
 		Uint32("gc.cycles", m.NumGC).
 		Float64("total.mem.mb", converters_utils.ToMegaByte(totalBytes)).

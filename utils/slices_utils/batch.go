@@ -1,7 +1,7 @@
 package slices_utils
 
 // CutInBatches
-// Cuts slice in batches, remaining will be put in extra batch
+// Cuts slice in batches, remaining will be put in extra batch.
 func CutInBatches[T any](slice []T, batchSize int) [][]T {
 	if batchSize <= 0 {
 		panic("batch size must be greater than zero")
@@ -18,9 +18,11 @@ func CutInBatches[T any](slice []T, batchSize int) [][]T {
 	batches := make([][]T, 0, len(slice)/batchSize)
 
 	var i int
-	for i = 0; i < len(slice)/batchSize; i++ {
+	for i = range len(slice) / batchSize {
 		batches = append(batches, slice[i*batchSize:(i+1)*batchSize])
 	}
+
+	i++
 
 	if (i)*batchSize < len(slice) {
 		batches = append(batches, slice[(i)*batchSize:])

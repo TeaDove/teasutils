@@ -18,7 +18,8 @@ func StringWithLen(length int) string {
 	}
 
 	var builder strings.Builder
-	for i := 0; i < length; i++ {
+	for range length {
+		//nolint: gosec // no need to be secure
 		builder.WriteByte(alfabet[rand.IntN(len(alfabet))])
 	}
 

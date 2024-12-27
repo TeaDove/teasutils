@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"syscall"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -11,8 +14,6 @@ import (
 	"github.com/teadove/teasutils/utils/redact_utils"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-	"os"
-	"syscall"
 )
 
 const (
@@ -60,15 +61,16 @@ func InitSetting[T any](
 		return *new(T), errors.Wrap(err, "failed to env parse")
 	}
 
-	settingsJson, err := json.Marshal(settings)
+	settingsJSON, err := json.Marshal(settings)
 	if err != nil {
 		return *new(T), errors.Wrap(err, "failed to marshal settings")
 	}
 
 	for _, valueKey := range omitFromLogValues {
-		res := gjson.GetBytes(settingsJson, valueKey)
-		settingsJson, err = sjson.SetBytes(
-			settingsJson,
+		res := gjson.GetBytes(settingsJSON, valueKey)
+
+		settingsJSON, err = sjson.SetBytes(
+			settingsJSON,
 			valueKey,
 			redact_utils.RedactWithPrefix(res.String()),
 		)
@@ -79,7 +81,7 @@ func InitSetting[T any](
 
 	zerolog.Ctx(ctx).
 		Debug().
-		RawJSON("v", settingsJson).
+		RawJSON("v", settingsJSON).
 		Msg("settings.loaded")
 
 	return settings, nil
