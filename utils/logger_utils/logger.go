@@ -46,7 +46,7 @@ func humanMarshalStack(err error) any {
 	return formatted
 }
 
-func makeLogger(loggerSettings *settings) zerolog.Logger {
+func makeLogger(loggerSettings *settings_utils.LogSettings) zerolog.Logger {
 	//nolint: reassign // Need this
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
@@ -68,14 +68,5 @@ func makeLogger(loggerSettings *settings) zerolog.Logger {
 	return logger
 }
 
-func makeLoggerFromSettings() zerolog.Logger {
-	loggerSettings, err := settings_utils.InitSetting[settings](context.Background(), "LOG_")
-	if err != nil {
-		panic(errors.Wrap(err, "failed to init base settings"))
-	}
-
-	return makeLogger(&loggerSettings)
-}
-
 //nolint:gochecknoglobals // need this
-var globalLogger = makeLoggerFromSettings()
+var globalLogger = makeLogger(&settings_utils.BaseSettings.Log)

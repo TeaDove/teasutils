@@ -2,10 +2,14 @@ package di_utils
 
 import (
 	"context"
+	stderrors "errors"
 	"os"
-	"os/signal"
 	"runtime/pprof"
 	"time"
+
+	"github.com/teadove/teasutils/utils/notify_utils"
+	"github.com/teadove/teasutils/utils/perf_utils"
+	"github.com/teadove/teasutils/utils/settings_utils"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -13,29 +17,55 @@ import (
 )
 
 type Container interface {
-	Health(ctx context.Context) []error
+	HealthCheckers() []func(ctx context.Context) error
+	Stoppers() []func(ctx context.Context) error
 }
 
 func withProfiler(ctx context.Context) error {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	if settings_utils.BaseSettings.Prof.SpamMemUsage {
+		go perf_utils.SpamLogMemUsage(ctx, settings_utils.BaseSettings.Prof.SpamMemUsagePeriod)
+		zerolog.Ctx(ctx).Warn().
+			Str("period", settings_utils.BaseSettings.Prof.SpamMemUsagePeriod.String()).
+			Msg("spam.memory.usage.added")
+	}
 
-	go func() {
-		for range c {
-			pprof.StopCPUProfile()
-			os.Exit(0)
-		}
-	}()
+	file, err := os.Create(settings_utils.BaseSettings.Prof.ResultFilename)
+	if err != nil {
+		return errors.Wrap(err, "could not open result file")
+	}
 
-	zerolog.Ctx(ctx).Error().Msg("cpu.profile.started")
+	err = pprof.StartCPUProfile(file)
+	if err != nil {
+		return errors.Wrap(err, "could not start CPU profile")
+	}
+
+	notify_utils.RunOnInterrupt(pprof.StopCPUProfile)
+
+	zerolog.Ctx(ctx).Warn().Msg("cpu.profile.started")
 
 	return nil
+}
+
+func stop(ctx context.Context, container Container) {
+	for _, stoper := range container.Stoppers() {
+		err := stoper(ctx)
+		if err != nil {
+			zerolog.Ctx(ctx).Error().Err(err).Msg("could.not.stop.container")
+		}
+	}
 }
 
 func BuildFromSettings[T Container](
 	ctx context.Context,
 	builder func(ctx context.Context) (T, error),
 ) (T, error) {
+	if settings_utils.BaseSettings.Prof.Enabled {
+		err := withProfiler(ctx)
+		if err != nil {
+			return *new(T), errors.Wrap(err, "failed to add profiler")
+		}
+	}
+
 	t0 := time.Now()
 
 	builtContainer, err := builder(ctx)
@@ -43,7 +73,15 @@ func BuildFromSettings[T Container](
 		return *new(T), errors.Wrap(err, "build container failed")
 	}
 
+	if !settings_utils.BaseSettings.Release {
+		errs := checkFromCheckers(ctx, builtContainer.HealthCheckers())
+		if len(errs) != 0 {
+			return *new(T), errors.Wrap(stderrors.Join(errs...), "health check failed")
+		}
+	}
+
 	runMetricsFromSettingsInBackground(ctx, builtContainer)
+	notify_utils.RunOnInterrupt(func() { stop(ctx, builtContainer) })
 
 	zerolog.Ctx(ctx).
 		Info().

@@ -2,87 +2,40 @@ package settings_utils
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"os"
-	"syscall"
+	"time"
 
-	"github.com/caarlos0/env/v11"
-	"github.com/joho/godotenv"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/utils/redact_utils"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
+	"github.com/teadove/teasutils/utils/must_utils"
 )
 
-const (
-	envFile = ".env"
-)
+type LogSettings struct {
+	// Level
+	// Can be trace, debug, info, warning, error etc.
+	Level string `env:"LEVEL" envDefault:"INFO"`
 
-// InitSetting
-// Initialize settings, example:
-//
-//		 type tg struct {
-//		   Token string `env:"token,required" json:"token"`
-//		 }
-//
-//		 type baseSettings struct {
-//			Tg  tg  `env:"tg"  json:"tg"  envPrefix:"tg__"`
-//		 }
-//		 func init() {
-//			  ctx := logger_utils.NewLoggedCtx()
-//
-//			  Settings = must_utils.Must(settings_utils.InitSetting[baseSettings](
-//			  	  ctx,
-//	           "teas_",
-//			  	  "tg.token",
-//			  ))
-//		 }
-//
-//		 var Settings baseSettings
-//
-// Panics if dotEnv file found, but corrupted.
-func InitSetting[T any](
-	ctx context.Context,
-	envPrefix string,
-	omitFromLogValues ...string,
-) (T, error) {
-	err := godotenv.Load(envFile)
-	if err != nil {
-		var pathErr *os.PathError
-		if !(errors.As(err, &pathErr) && errors.Is(pathErr.Err, syscall.ENOENT)) {
-			panic(fmt.Sprintf("failed to load dotenv file %s: %v", envFile, err))
-		}
-	}
-
-	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
-	if err != nil {
-		return *new(T), errors.Wrap(err, "failed to env parse")
-	}
-
-	settingsJSON, err := json.Marshal(settings)
-	if err != nil {
-		return *new(T), errors.Wrap(err, "failed to marshal settings")
-	}
-
-	for _, valueKey := range omitFromLogValues {
-		res := gjson.GetBytes(settingsJSON, valueKey)
-
-		settingsJSON, err = sjson.SetBytes(
-			settingsJSON,
-			valueKey,
-			redact_utils.RedactWithPrefix(res.String()),
-		)
-		if err != nil {
-			return *new(T), errors.Wrap(err, "failed to redact settings")
-		}
-	}
-
-	zerolog.Ctx(ctx).
-		Debug().
-		RawJSON("v", settingsJSON).
-		Msg("settings.loaded")
-
-	return settings, nil
+	// Factory
+	// Zerolog factory, can be console (with fancy colors ✨🪄🔮💫) or json (⚙️)
+	Factory string `env:"FACTORY" envDefault:"CONSOLE"`
 }
+
+type ProfSettings struct {
+	Enabled            bool          `env:"ENABLED"               envDefault:"false"`
+	ResultFilename     string        `env:"RESULT_FILENAME"       envDefault:"cpu.prof"`
+	SpamMemUsage       bool          `env:"SPAM_MEM_USAGE"        envDefault:"true"`
+	SpamMemUsagePeriod time.Duration `env:"SPAM_MEM_USAGE_PERIOD" envDefault:"1s"`
+}
+
+type MetricsSettings struct {
+	URL            string        `env:"URL"             envDefault:"0.0.0.0:8083"`
+	RequestTimeout time.Duration `env:"REQUEST_TIMEOUT" envDefault:"10s"`
+}
+
+type baseSettings struct {
+	Release bool `env:"RELEASE" envDefault:"true"`
+
+	Log     LogSettings     `envPrefix:"LOG__"`
+	Prof    ProfSettings    `envPrefix:"PROF__"`
+	Metrics MetricsSettings `envPrefix:"METRICS__"`
+}
+
+//nolint:gochecknoglobals // need this
+var BaseSettings = must_utils.Must(InitSetting[baseSettings](context.Background(), "BASE_"))

@@ -3,6 +3,8 @@ package logger_utils
 import (
 	"testing"
 
+	"github.com/teadove/teasutils/utils/settings_utils"
+
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +22,7 @@ func TestUnit_LoggerUtils_ErrorWithStackrace_Ok(t *testing.T) {
 func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
 	t.Parallel()
 
-	logger := makeLogger(&settings{
+	logger := makeLogger(&settings_utils.LogSettings{
 		Level:   "DEBUG",
 		Factory: "JSON",
 	})
