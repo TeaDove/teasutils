@@ -6,6 +6,8 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/teadove/teasutils/utils/notify_utils"
 	"github.com/teadove/teasutils/utils/perf_utils"
 	"github.com/teadove/teasutils/utils/settings_utils"
@@ -46,11 +48,19 @@ func withProfiler(ctx context.Context) error {
 }
 
 func stop(ctx context.Context, container Container) {
+	var errorsGroup errgroup.Group
 	for _, stoper := range container.Stoppers() {
-		err := stoper(ctx)
-		if err != nil {
-			zerolog.Ctx(ctx).Error().Err(err).Msg("could.not.stop.container")
-		}
+		errorsGroup.Go(func() error {
+			return stoper(ctx)
+		})
+	}
+
+	err := errorsGroup.Wait()
+	if err != nil {
+		zerolog.Ctx(ctx).
+			Error().
+			Stack().Err(err).
+			Msg("could.not.stop.container")
 	}
 }
 
@@ -80,7 +90,13 @@ func BuildFromSettings[T Container](
 	}
 
 	runMetricsFromSettingsInBackground(ctx, builtContainer)
-	notify_utils.RunOnInterrupt(func() { stop(ctx, builtContainer) })
+	notify_utils.RunOnInterrupt(func() {
+		zerolog.Ctx(ctx).
+			Info().
+			Str("container", refrect_utils.GetTypesStringRepresentation(builtContainer)).
+			Msg("stopping.container")
+		stop(ctx, builtContainer)
+	})
 
 	zerolog.Ctx(ctx).
 		Info().

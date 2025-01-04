@@ -3,9 +3,18 @@ package redact_utils
 import "fmt"
 
 const (
-	redacted = "[REDACTED]"
-	maxLen   = 5
+	redacted       = "[REDACTED]"
+	redactedMaxLen = 5
+	trimmedMaxLen  = 10
 )
+
+func Trim(s string) string {
+	if len(s) <= trimmedMaxLen {
+		return fmt.Sprintf("[%s]", s)
+	}
+
+	return fmt.Sprintf("[%s...:%d]", s[:redactedMaxLen], len(s))
+}
 
 func Redact(s string) string {
 	if len(s) == 0 {
@@ -16,9 +25,9 @@ func Redact(s string) string {
 }
 
 func RedactWithPrefix(s string) string {
-	if len(s) <= maxLen {
+	if len(s) <= redactedMaxLen {
 		return Redact(s)
 	}
 
-	return fmt.Sprintf("[REDACTED:%s...:%d]", s[:maxLen], len(s))
+	return fmt.Sprintf("[REDACTED:%s...:%d]", s[:redactedMaxLen], len(s))
 }

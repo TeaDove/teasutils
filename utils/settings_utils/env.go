@@ -26,19 +26,19 @@ const (
 // Initialize settings, example:
 //
 //		 type tg struct {
-//		   Token string `env:"token,required" json:"token"`
+//		   Token string `env:"TOKEN,required"`
 //		 }
 //
 //		 type baseSettings struct {
-//			Tg  tg  `env:"tg"  json:"tg"  envPrefix:"tg__"`
+//			TG  tg  `env:"TG" envPrefix:"TG__"`
 //		 }
 //		 func init() {
 //			  ctx := logger_utils.NewLoggedCtx()
 //
 //			  Settings = must_utils.Must(settings_utils.InitSetting[baseSettings](
 //			  	  ctx,
-//	           "teas_",
-//			  	  "tg.token",
+//	           "TEAS_",
+//			  	  "TG.Token",
 //			  ))
 //		 }
 //
