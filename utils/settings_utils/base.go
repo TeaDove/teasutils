@@ -3,8 +3,6 @@ package settings_utils
 import (
 	"context"
 	"time"
-
-	"github.com/teadove/teasutils/utils/must_utils"
 )
 
 type LogSettings struct {
@@ -38,4 +36,4 @@ type baseSettings struct {
 }
 
 //nolint:gochecknoglobals // need this
-var BaseSettings = must_utils.Must(InitSetting[baseSettings](context.Background(), "BASE_"))
+var BaseSettings = MustInitSetting[baseSettings](context.Background(), "BASE_")

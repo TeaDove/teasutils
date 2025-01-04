@@ -7,6 +7,8 @@ import (
 	"os"
 	"syscall"
 
+	"github.com/teadove/teasutils/utils/must_utils"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -85,4 +87,12 @@ func InitSetting[T any](
 		Msg("settings.loaded")
 
 	return settings, nil
+}
+
+func MustInitSetting[T any](
+	ctx context.Context,
+	envPrefix string,
+	omitFromLogValues ...string,
+) T {
+	return must_utils.Must(InitSetting[T](ctx, envPrefix, omitFromLogValues...))
 }
