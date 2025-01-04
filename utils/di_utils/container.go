@@ -49,7 +49,7 @@ func withProfiler(ctx context.Context) error {
 	return nil
 }
 
-func stop(ctx context.Context, container Container) {
+func stop(ctx context.Context, container Container) error {
 	errorsGroup, ctx := errgroup.WithContext(ctx)
 
 	ctx, cancel := context.WithTimeout(ctx, settings_utils.BaseSettings.Metrics.CloseTimeout)
@@ -63,11 +63,10 @@ func stop(ctx context.Context, container Container) {
 
 	err := errorsGroup.Wait()
 	if err != nil {
-		zerolog.Ctx(ctx).
-			Error().
-			Stack().Err(err).
-			Msg("could.not.stop.container")
+		return errors.Wrap(err, "could not stop container")
 	}
+
+	return nil
 }
 
 func BuildFromSettings[T Container](
@@ -97,11 +96,25 @@ func BuildFromSettings[T Container](
 
 	runMetricsFromSettingsInBackground(ctx, builtContainer)
 	notify_utils.RunOnInterrupt(func() {
+		t0 = time.Now()
+
 		zerolog.Ctx(ctx).
 			Info().
-			Str("container", refrect_utils.GetTypesStringRepresentation(builtContainer)).
 			Msg("stopping.container")
-		stop(ctx, builtContainer)
+
+		err = stop(ctx, builtContainer)
+		if err != nil {
+			zerolog.Ctx(ctx).
+				Error().
+				Str("elapsed", time.Since(t0).String()).
+				Err(err).Stack().
+				Msg("could not stop container")
+		}
+
+		zerolog.Ctx(ctx).
+			Info().
+			Str("elapsed", time.Since(t0).String()).
+			Msg("container.stoped")
 	})
 
 	zerolog.Ctx(ctx).

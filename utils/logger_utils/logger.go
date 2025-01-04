@@ -46,11 +46,11 @@ func humanMarshalStack(err error) any {
 	return formatted
 }
 
-func makeLogger(loggerSettings *settings_utils.LogSettings) zerolog.Logger {
+func makeLogger() zerolog.Logger {
 	//nolint: reassign // Need this
 	zerolog.ErrorStackMarshaler = humanMarshalStack
 
-	level := must_utils.Must(zerolog.ParseLevel(loggerSettings.Level))
+	level := must_utils.Must(zerolog.ParseLevel(settings_utils.BaseSettings.Log.Level))
 
 	logger := zerolog.New(os.Stderr).
 		With().
@@ -59,7 +59,7 @@ func makeLogger(loggerSettings *settings_utils.LogSettings) zerolog.Logger {
 		Logger().
 		Level(level)
 
-	if strings.EqualFold(loggerSettings.Factory, "CONSOLE") {
+	if strings.EqualFold(settings_utils.BaseSettings.Log.Factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 	}
 
@@ -69,4 +69,4 @@ func makeLogger(loggerSettings *settings_utils.LogSettings) zerolog.Logger {
 }
 
 //nolint:gochecknoglobals // need this
-var globalLogger = makeLogger(&settings_utils.BaseSettings.Log)
+var globalLogger = makeLogger()
