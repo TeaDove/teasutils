@@ -2,7 +2,7 @@ GO ?= GO111MODULE=on CGO_ENABLED=0 go
 VERSION ?= $(shell cat VERSION)
 
 test:
-	$(GO) test ./...
+	$(GO) test ./... -count=1
 
 update-all:
 	$(GO) get -u ./...

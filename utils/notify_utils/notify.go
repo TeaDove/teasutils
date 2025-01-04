@@ -10,8 +10,9 @@ func RunOnInterrupt(f func()) {
 	signal.Notify(c, os.Interrupt)
 
 	go func() {
-		for range c {
+		for sig := range c {
 			f()
+			signal.Reset(sig)
 		}
 	}()
 }
