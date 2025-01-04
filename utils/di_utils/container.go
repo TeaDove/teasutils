@@ -6,6 +6,8 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/teadove/teasutils/utils/context_utils"
+
 	"golang.org/x/sync/errgroup"
 
 	"github.com/teadove/teasutils/utils/notify_utils"
@@ -48,10 +50,14 @@ func withProfiler(ctx context.Context) error {
 }
 
 func stop(ctx context.Context, container Container) {
-	var errorsGroup errgroup.Group
+	errorsGroup, ctx := errgroup.WithContext(ctx)
+
+	ctx, cancel := context.WithTimeout(ctx, settings_utils.BaseSettings.Metrics.CloseTimeout)
+	defer cancel()
+
 	for _, stoper := range container.Stoppers() {
 		errorsGroup.Go(func() error {
-			return stoper(ctx)
+			return context_utils.CPUCancel(ctx, stoper)
 		})
 	}
 

@@ -40,12 +40,6 @@ func runMetrics(ctx context.Context, url string, container Container) error {
 	server.HandleFunc("/health", func(writer http.ResponseWriter, request *http.Request) {
 		innerCtx := logger_utils.AddLoggerToCtx(request.Context())
 
-		innerCtx, cancel := context.WithTimeout(
-			innerCtx,
-			settings_utils.BaseSettings.Metrics.RequestTimeout,
-		)
-		defer cancel()
-
 		errFromChecker := checkFromCheckers(innerCtx, container.HealthCheckers())
 		if errFromChecker == nil {
 			writer.WriteHeader(http.StatusOK)

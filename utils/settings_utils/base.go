@@ -25,6 +25,7 @@ type ProfSettings struct {
 type MetricsSettings struct {
 	URL            string        `env:"URL"             envDefault:"0.0.0.0:8083"`
 	RequestTimeout time.Duration `env:"REQUEST_TIMEOUT" envDefault:"10s"`
+	CloseTimeout   time.Duration `env:"CLOSE_TIMEOUT"   envDefault:"10s"`
 }
 
 type baseSettings struct {
