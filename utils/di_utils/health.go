@@ -2,31 +2,31 @@ package di_utils
 
 import (
 	"context"
-	stderrors "errors"
+
+	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/rs/zerolog"
 )
 
-func checkFromCheckers(ctx context.Context, checkers []func(ctx context.Context) error) []error {
-	var (
-		errors  = make([]error, 0)
-		err     error
-		checker func(ctx context.Context) error
-	)
+func checkFromCheckers(ctx context.Context, checkers []func(ctx context.Context) error) error {
+	var checker func(ctx context.Context) error
 
+	errGroup, ctx := errgroup.WithContext(ctx)
 	for _, checker = range checkers {
-		err = checker(ctx)
-		if err != nil {
-			errors = append(errors, err)
-		}
+		errGroup.Go(func() error { return checker(ctx) })
 	}
 
-	if len(errors) > 0 {
+	err := errGroup.Wait()
+	if err != nil {
+		err = errors.Wrap(err, "failed to check")
 		zerolog.Ctx(ctx).
 			Error().Stack().
-			Err(stderrors.Join(errors...)).
+			Err(err).
 			Msg("checking.failed")
+
+		return err
 	}
 
-	return errors
+	return nil
 }

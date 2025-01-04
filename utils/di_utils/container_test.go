@@ -40,5 +40,5 @@ func TestUnit_DIUtils_MustBuildFromSettingsAndRun_Ok(t *testing.T) {
 			return &TestContainer{}, nil
 		},
 	)
-	assert.Empty(t, checkFromCheckers(ctx, container.HealthCheckers()))
+	assert.NoError(t, checkFromCheckers(ctx, container.HealthCheckers()))
 }

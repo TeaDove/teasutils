@@ -2,7 +2,6 @@ package di_utils
 
 import (
 	"context"
-	stderrors "errors"
 	"os"
 	"runtime/pprof"
 	"time"
@@ -74,9 +73,9 @@ func BuildFromSettings[T Container](
 	}
 
 	if !settings_utils.BaseSettings.Release {
-		errs := checkFromCheckers(ctx, builtContainer.HealthCheckers())
-		if len(errs) != 0 {
-			return *new(T), errors.Wrap(stderrors.Join(errs...), "health check failed")
+		err = checkFromCheckers(ctx, builtContainer.HealthCheckers())
+		if err != nil {
+			return *new(T), errors.Wrap(err, "health check failed")
 		}
 	}
 

@@ -2,7 +2,6 @@ package di_utils
 
 import (
 	"context"
-	stderrors "errors"
 	"fmt"
 	"net/http"
 
@@ -47,8 +46,8 @@ func runMetrics(ctx context.Context, url string, container Container) error {
 		)
 		defer cancel()
 
-		errs := checkFromCheckers(innerCtx, container.HealthCheckers())
-		if len(errs) == 0 {
+		errFromChecker := checkFromCheckers(innerCtx, container.HealthCheckers())
+		if errFromChecker == nil {
 			writer.WriteHeader(http.StatusOK)
 
 			_, err := writer.Write([]byte("ok"))
@@ -61,7 +60,7 @@ func runMetrics(ctx context.Context, url string, container Container) error {
 
 		writer.WriteHeader(http.StatusServiceUnavailable)
 
-		_, err := writer.Write([]byte(stderrors.Join(errs...).Error()))
+		_, err := writer.Write([]byte(errFromChecker.Error()))
 		if err != nil {
 			zerolog.Ctx(innerCtx).Error().Stack().Err(err).Msg("failed.to.write.errs")
 		}
