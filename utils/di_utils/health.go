@@ -12,15 +12,15 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func checkFromCheckers(ctx context.Context, checkers []func(ctx context.Context) error) error {
+func checkFromCheckers(ctx context.Context, checkers []Health) error {
 	ctx, cancel := context.WithTimeout(ctx, settings_utils.BaseSettings.Metrics.RequestTimeout)
 	defer cancel()
 
-	var checker func(ctx context.Context) error
+	var healthCheckable Health
 
 	errGroup, ctx := errgroup.WithContext(ctx)
-	for _, checker = range checkers {
-		errGroup.Go(func() error { return context_utils.CPUCancel(ctx, checker) })
+	for _, healthCheckable = range checkers {
+		errGroup.Go(func() error { return context_utils.CPUCancel(ctx, healthCheckable.Health) })
 	}
 
 	err := errGroup.Wait()

@@ -15,28 +15,30 @@ import (
 
 type TestContainer struct{}
 
-func (r *TestContainer) HealthCheckers() []func(ctx context.Context) error {
-	return []func(ctx context.Context) error{
-		func(ctx context.Context) error {
-			zerolog.Ctx(ctx).Info().Msg("health.checked")
-			return nil
-		},
-	}
+type testService struct{}
+
+func (r *testService) Health(ctx context.Context) error {
+	zerolog.Ctx(ctx).Info().Msg("health.checked")
+	return nil
 }
 
-func (r *TestContainer) Stoppers() []func(ctx context.Context) error {
-	return []func(ctx context.Context) error{
-		func(ctx context.Context) error {
-			time.Sleep(time.Minute)
-			zerolog.Ctx(ctx).Info().Msg("stopped")
-			return nil
-		},
-	}
+func (r *testService) Close(ctx context.Context) error {
+	time.Sleep(time.Minute)
+	zerolog.Ctx(ctx).Info().Msg("stopped")
+
+	return nil
 }
 
+func (r *TestContainer) Healths() []Health {
+	return []Health{&testService{}}
+}
+
+func (r *TestContainer) Closers() []CloserWithContext {
+	return []CloserWithContext{&testService{}}
+}
+
+//nolint: paralleltest // fails otherwise
 func TestUnit_DIUtils_MustBuildFromSettingsAndRun_Ok(t *testing.T) {
-	t.Parallel()
-
 	ctx := logger_utils.NewLoggedCtx()
 	settings_utils.BaseSettings.Metrics.URL = "0.0.0.0:8083"
 
@@ -46,12 +48,11 @@ func TestUnit_DIUtils_MustBuildFromSettingsAndRun_Ok(t *testing.T) {
 			return &TestContainer{}, nil
 		},
 	)
-	assert.NoError(t, checkFromCheckers(ctx, container.HealthCheckers()))
+	assert.NoError(t, checkFromCheckers(ctx, container.Healths()))
 }
 
+//nolint: paralleltest // fails otherwise
 func TestUnit_DIUtils_MustBuildFromSettingsStopInf_LogsErr(t *testing.T) {
-	t.Parallel()
-
 	ctx := logger_utils.NewLoggedCtx()
 	settings_utils.BaseSettings.Metrics.URL = "0.0.0.0:8084"
 

@@ -19,9 +19,17 @@ import (
 	"github.com/teadove/teasutils/utils/refrect_utils"
 )
 
+type CloserWithContext interface {
+	Close(ctx context.Context) error
+}
+
+type Health interface {
+	Health(ctx context.Context) error
+}
+
 type Container interface {
-	HealthCheckers() []func(ctx context.Context) error
-	Stoppers() []func(ctx context.Context) error
+	Healths() []Health
+	Closers() []CloserWithContext
 }
 
 func withProfiler(ctx context.Context) error {
@@ -55,9 +63,9 @@ func stop(ctx context.Context, container Container) error {
 	ctx, cancel := context.WithTimeout(ctx, settings_utils.BaseSettings.Metrics.CloseTimeout)
 	defer cancel()
 
-	for _, stoper := range container.Stoppers() {
+	for _, stoper := range container.Closers() {
 		errorsGroup.Go(func() error {
-			return context_utils.CPUCancel(ctx, stoper)
+			return context_utils.CPUCancel(ctx, stoper.Close)
 		})
 	}
 
@@ -88,7 +96,7 @@ func BuildFromSettings[T Container](
 	}
 
 	if !settings_utils.BaseSettings.Release {
-		err = checkFromCheckers(ctx, builtContainer.HealthCheckers())
+		err = checkFromCheckers(ctx, builtContainer.Healths())
 		if err != nil {
 			return *new(T), errors.Wrap(err, "health check failed")
 		}
