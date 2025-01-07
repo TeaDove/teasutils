@@ -7,6 +7,8 @@ import (
 )
 
 func TestUnit_SlicesUtils_PythoniseIdx_Ok(t *testing.T) {
+	t.Parallel()
+
 	a := []int{1, 2, 3}
 
 	assert.Equal(t, 1, PythoniseIdx(a, 1))
@@ -18,6 +20,8 @@ func TestUnit_SlicesUtils_PythoniseIdx_Ok(t *testing.T) {
 }
 
 func TestUnit_SlicesUtils_PythoniseIdxGet_Ok(t *testing.T) {
+	t.Parallel()
+
 	a := []int{1, 2, 3}
 
 	assert.Equal(t, 2, PythoniseIdxGet(a, 1))
