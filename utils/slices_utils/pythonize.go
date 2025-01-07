@@ -17,11 +17,19 @@ func PSIdx(slice string, idx int) int {
 }
 
 func PGet[T []E, E any](slice T, idx int) E {
-	if idx >= 0 {
-		return slice[idx]
+	return slice[PIdx(slice, idx)]
+}
+
+func PAGet[T []E, E any](slice T, start int, end int) []E {
+	if end >= 0 {
+		if start >= 0 {
+			return slice[start:end]
+		}
+
+		return slice[len(slice)-start : end]
 	}
 
-	return slice[len(slice)+idx]
+	return slice[PIdx(slice, start):PIdx(slice, end)]
 }
 
 func PSGet(slice string, idx int) byte {
@@ -29,5 +37,9 @@ func PSGet(slice string, idx int) byte {
 		return slice[idx]
 	}
 
-	return slice[len(slice)+idx]
+	return slice[PSIdx(slice, idx)]
+}
+
+func PSAGet(slice string, start int, end int) string {
+	return slice[PSIdx(slice, start):PSIdx(slice, end)]
 }
