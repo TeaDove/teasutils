@@ -2,8 +2,7 @@ package chan_utils
 
 import "sync"
 
-// Duplicator
-// Duplicates data to 2 chains.
+// Both channels are never closed, cap is the same as in parent chan.
 func Duplicator[T any](channel <-chan T, wg *sync.WaitGroup) (chan T, chan T) {
 	a := make(chan T, cap(channel))
 	b := make(chan T, cap(channel))

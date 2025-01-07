@@ -6,6 +6,7 @@ import (
 	"github.com/teadove/teasutils/utils/must_utils"
 )
 
+// Useful when you need to cancel no-io-bound cpu routine.
 func CPUCancel(ctx context.Context, f func(ctx context.Context) error) (err error) {
 	defer func() {
 		err = must_utils.AnyToErr(recover())
