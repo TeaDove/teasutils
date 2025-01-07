@@ -22,11 +22,11 @@ func TestUnit_SlicesUtils_PythoniseIdx_Ok(t *testing.T) {
 func TestUnit_SlicesUtils_PythoniseIdxGet_Ok(t *testing.T) {
 	t.Parallel()
 
-	a := []int{1, 2, 3}
+	a := []string{"1", "2", "3"}
 
-	assert.Equal(t, 2, PythoniseIdxGet(a, 1))
-	assert.Equal(t, 1, PythoniseIdxGet(a, 0))
-	assert.Equal(t, 3, PythoniseIdxGet(a, -1))
-	assert.Equal(t, 2, PythoniseIdxGet(a, -2))
-	assert.Equal(t, 1, PythoniseIdxGet(a, -3))
+	assert.Equal(t, "2", PythoniseIdxGet(a, 1))
+	assert.Equal(t, "1", PythoniseIdxGet(a, 0))
+	assert.Equal(t, "3", PythoniseIdxGet(a, -1))
+	assert.Equal(t, "2", PythoniseIdxGet(a, -2))
+	assert.Equal(t, "1", PythoniseIdxGet(a, -3))
 }

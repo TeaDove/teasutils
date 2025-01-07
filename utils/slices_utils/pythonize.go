@@ -1,6 +1,6 @@
 package slices_utils
 
-func PythoniseIdx[T any](slice []T, idx int) int {
+func PythoniseIdx[T ~[]E, E any](slice T, idx int) int {
 	if idx >= 0 {
 		return idx
 	}
@@ -8,7 +8,7 @@ func PythoniseIdx[T any](slice []T, idx int) int {
 	return len(slice) + idx
 }
 
-func PythoniseIdxGet[T any](slice []T, idx int) T {
+func PythoniseIdxGet[T ~[]E, E any](slice T, idx int) E {
 	if idx >= 0 {
 		return slice[idx]
 	}
