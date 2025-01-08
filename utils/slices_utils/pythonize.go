@@ -21,22 +21,10 @@ func PGet[T []E, E any](slice T, idx int) E {
 }
 
 func PAGet[T []E, E any](slice T, start int, end int) []E {
-	if end >= 0 {
-		if start >= 0 {
-			return slice[start:end]
-		}
-
-		return slice[len(slice)-start : end]
-	}
-
 	return slice[PIdx(slice, start):PIdx(slice, end)]
 }
 
 func PSGet(slice string, idx int) byte {
-	if idx >= 0 {
-		return slice[idx]
-	}
-
 	return slice[PSIdx(slice, idx)]
 }
 
