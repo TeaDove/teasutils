@@ -1,7 +1,9 @@
 package converters_utils
 
 import (
+	"fmt"
 	"math"
+	"strconv"
 
 	"golang.org/x/exp/constraints"
 )
@@ -9,7 +11,7 @@ import (
 const (
 	thousand       = 1000
 	binaryThousand = 1024
-	precision      = 2
+	precision      = 5
 )
 
 func round(num float64) int {
@@ -23,26 +25,78 @@ func ToFixed(num float64, precision int) float64 {
 	return float64(round(num*output)) / output
 }
 
-func ToKilo[T constraints.Integer](bytes T) float64 {
-	return ToFixed(float64(bytes)/thousand, precision)
+func ToKilo[T constraints.Integer | constraints.Float](bytes T) float64 {
+	return float64(bytes) / thousand
 }
 
-func ToKiloByte[T constraints.Integer](bytes T) float64 {
-	return ToFixed(float64(bytes)/binaryThousand, precision)
+func ToKiloByte[T constraints.Integer | constraints.Float](bytes T) float64 {
+	return float64(bytes) / binaryThousand
 }
 
-func ToMega[T constraints.Integer](bytes T) float64 {
-	return ToFixed(float64(bytes)/thousand/thousand, precision)
+func ToMega[T constraints.Integer | constraints.Float](bytes T) float64 {
+	return float64(bytes) / thousand / thousand
 }
 
-func ToMegaByte[T constraints.Integer](bytes T) float64 {
-	return ToFixed(float64(bytes)/binaryThousand/binaryThousand, precision)
+func ToMegaByte[T constraints.Integer | constraints.Float](bytes T) float64 {
+	return float64(bytes) / binaryThousand / binaryThousand
 }
 
-func ToGiga[T constraints.Integer](bytes T) float64 {
-	return ToFixed(float64(bytes)/thousand/thousand/thousand, precision)
+func ToGiga[T constraints.Integer | constraints.Float](bytes T) float64 {
+	return float64(bytes) / thousand / thousand / thousand
 }
 
-func ToGigaByte[T constraints.Integer](bytes T) float64 {
-	return ToFixed(float64(bytes)/binaryThousand/binaryThousand/binaryThousand, precision)
+func ToGigaByte[T constraints.Integer | constraints.Float](bytes T) float64 {
+	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand
+}
+
+func ToClosestByte[T constraints.Integer | constraints.Float](bytes T) (float64, uint) {
+	if float64(bytes) <= binaryThousand {
+		return float64(bytes), 0 // B
+	}
+
+	if float64(bytes) <= binaryThousand*binaryThousand {
+		return float64(bytes) / binaryThousand, 1 // KB
+	}
+
+	if float64(bytes) <= binaryThousand*binaryThousand*binaryThousand {
+		//nolint: mnd // go fuck yourself
+		return float64(bytes) / binaryThousand / binaryThousand, 2 // MB
+	}
+
+	if float64(bytes) <= binaryThousand*binaryThousand*binaryThousand*binaryThousand {
+		//nolint: mnd // go fuck yourself
+		return float64(bytes) / binaryThousand / binaryThousand / binaryThousand, 3 // GB
+	}
+
+	//nolint: mnd // go fuck yourself
+	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand / binaryThousand, 4 // TB
+}
+
+func ToClosestByteAsString[T constraints.Integer | constraints.Float](bytes T, precision int) string {
+	rounded, pow := ToClosestByte(bytes)
+
+	var digit string
+
+	switch pow {
+	
+	case 0:
+		digit = "B"
+	
+	case 1:
+		digit = "KB"
+	//nolint: mnd // go fuck yourself
+	case 2:
+		digit = "MB"
+	//nolint: mnd // go fuck yourself
+	case 3:
+		digit = "GB"
+	default:
+		digit = "TB"
+	}
+
+	return fmt.Sprintf(
+		"%s %s",
+		strconv.FormatFloat(ToFixed(rounded, precision), 'f', -1, 64),
+		digit,
+	)
 }
