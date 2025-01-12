@@ -22,7 +22,7 @@ func TestUnit_Settings_Init_Ok(t *testing.T) {
 	assert.Equal(t, "julia", settings.User)
 }
 
-//nolint: paralleltest // working with files
+// nolint: paralleltest // working with files
 func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 	type Settings struct {
 		User     string `env:"user"     envDefault:"masha"               json:"user"`
@@ -45,7 +45,7 @@ func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 	require.NoError(t, err)
 }
 
-//nolint: paralleltest // working with files
+// nolint: paralleltest // working with files
 func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 	type Settings struct {
 		User     string `env:"user"     envDefault:"masha"               json:"user"`
@@ -66,4 +66,9 @@ func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 
 	err = os.Remove(envFile)
 	require.NoError(t, err)
+}
+
+// nolint: paralleltest // working with files
+func TestUnit_Settings_TimeSetted_Ok(t *testing.T) {
+	assert.NotEmpty(t, BaseSettings.StartedAt)
 }
