@@ -1,4 +1,4 @@
-package converters_utils
+package conv_utils
 
 import (
 	"testing"

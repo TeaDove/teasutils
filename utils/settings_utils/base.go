@@ -29,7 +29,7 @@ type metricsSettings struct {
 }
 
 type baseSettings struct {
-	Release   bool      `env:"RELEASE" envDefault:"true"`
+	Release   bool      `env:"RELEASE"    envDefault:"true"`
 	StartedAt time.Time `env:"START_TIME" envDefault:""`
 
 	Log     logSettings     `envPrefix:"LOG__"`
@@ -44,6 +44,7 @@ func (r *baseSettings) Uptime() time.Duration {
 //nolint:gochecknoglobals // need this
 var BaseSettings = MustInitSetting[baseSettings](context.Background(), "BASE_")
 
+//nolint: gochecknoinits // required here
 func init() {
 	if BaseSettings.StartedAt.IsZero() {
 		BaseSettings.StartedAt = time.Now().UTC()

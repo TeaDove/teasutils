@@ -1,4 +1,4 @@
-package converters_utils
+package conv_utils
 
 import (
 	"fmt"
@@ -78,10 +78,9 @@ func ToClosestByteAsString[T constraints.Integer | constraints.Float](bytes T, p
 	var digit string
 
 	switch pow {
-	
 	case 0:
 		digit = "B"
-	
+
 	case 1:
 		digit = "KB"
 	//nolint: mnd // go fuck yourself
