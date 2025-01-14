@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	thousand       = 1000
-	binaryThousand = 1024
-	precision      = 5
+	thousand         = 1000
+	binaryThousand   = 1024
+	defaultPrecision = 2
 )
 
 func round(num float64) int {
@@ -49,7 +49,7 @@ func ToGigaByte[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand
 }
 
-func ToClosestByte[T constraints.Integer | constraints.Float](bytes T) (float64, uint) {
+func ClosestByteAndK[T constraints.Integer | constraints.Float](bytes T) (float64, uint) {
 	if float64(bytes) <= binaryThousand {
 		return float64(bytes), 0 // B
 	}
@@ -72,8 +72,8 @@ func ToClosestByte[T constraints.Integer | constraints.Float](bytes T) (float64,
 	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand / binaryThousand, 4 // TB
 }
 
-func ToClosestByteAsString[T constraints.Integer | constraints.Float](bytes T, precision int) string {
-	rounded, pow := ToClosestByte(bytes)
+func ClosestByteWithPrecision[T constraints.Integer | constraints.Float](bytes T, precision int) string {
+	rounded, pow := ClosestByteAndK(bytes)
 
 	var digit string
 
@@ -98,4 +98,8 @@ func ToClosestByteAsString[T constraints.Integer | constraints.Float](bytes T, p
 		strconv.FormatFloat(ToFixed(rounded, precision), 'f', -1, 64),
 		digit,
 	)
+}
+
+func ClosestByte[T constraints.Integer | constraints.Float](bytes T) string {
+	return ClosestByteWithPrecision(bytes, defaultPrecision)
 }
