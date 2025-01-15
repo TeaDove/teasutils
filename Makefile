@@ -9,7 +9,7 @@ tag:
 	git push origin --tags
 
 test:
-	$(GO) test ./... -count=1
+	$(GO) test ./...
 
 lint:
 	gofumpt -w .
