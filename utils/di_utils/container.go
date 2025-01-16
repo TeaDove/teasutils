@@ -50,8 +50,6 @@ func withProfiler(ctx context.Context) error {
 		return errors.Wrap(err, "could not start CPU profile")
 	}
 
-	notify_utils.RunOnInterrupt(pprof.StopCPUProfile)
-
 	zerolog.Ctx(ctx).Warn().Msg("cpu.profile.started")
 
 	return nil
@@ -103,12 +101,16 @@ func BuildFromSettings[T Container](
 	}
 
 	runMetricsFromSettingsInBackground(ctx, builtContainer)
-	notify_utils.RunOnInterrupt(func() {
+	notify_utils.RunOnInterruptAndExit(func() {
 		t0 = time.Now()
 
 		zerolog.Ctx(ctx).
-			Info().
+			Debug().
 			Msg("stopping.container")
+
+		if settings_utils.BaseSettings.Prof.Enabled {
+			pprof.StopCPUProfile()
+		}
 
 		err = stop(ctx, builtContainer)
 		if err != nil {

@@ -2,7 +2,6 @@ package settings_utils
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"os"
 	"regexp"
 	"time"
@@ -32,8 +31,8 @@ type metricsSettings struct {
 }
 
 type baseSettings struct {
-	Release     bool      `env:"RELEASE"    envDefault:"true"`
-	StartedAt   time.Time `env:"START_TIME" envDefault:""`
+	Release     bool      `env:"RELEASE"      envDefault:"true"`
+	StartedAt   time.Time `env:"START_TIME"   envDefault:""`
 	ServiceName string    `env:"SERVICE_NAME" envDefault:""`
 
 	Log     logSettings     `envPrefix:"LOG__"`
@@ -59,13 +58,11 @@ func setServiceName(settings *baseSettings) {
 		return
 	}
 
-	kubepodNameRegexp, err := regexp.Compile(`^(.+)-\w+-\w+$`)
-	if err != nil {
-		panic(errors.Wrap(err, "failed to compile kubepod name regexp"))
-	}
+	foundString := regexp.MustCompile(`^(.+)-\w+-\w+$`).FindStringSubmatch(hostName)
 
-	foundString := kubepodNameRegexp.FindStringSubmatch(hostName)
-	if len(foundString) == 2 {
+	const maxAllowedGroups = 2
+
+	if len(foundString) == maxAllowedGroups {
 		settings.ServiceName = foundString[1]
 		return
 	}
@@ -79,7 +76,7 @@ func setStartedAt(settings *baseSettings) {
 	}
 }
 
-// nolint: gochecknoinits // required here
+//nolint: gochecknoinits // required here
 func init() {
 	setServiceName(&BaseSettings)
 	setStartedAt(&BaseSettings)
