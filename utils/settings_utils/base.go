@@ -25,7 +25,7 @@ type profSettings struct {
 }
 
 type metricsSettings struct {
-	URL            string        `env:"URL"             envDefault:"0.0.0.0:8083"`
+	URL            string        `env:"URL"             envDefault:"0.0.0.0:8093"`
 	RequestTimeout time.Duration `env:"REQUEST_TIMEOUT" envDefault:"10s"`
 	CloseTimeout   time.Duration `env:"CLOSE_TIMEOUT"   envDefault:"10s"`
 }
@@ -76,7 +76,7 @@ func setStartedAt(settings *baseSettings) {
 	}
 }
 
-//nolint: gochecknoinits // required here
+// nolint: gochecknoinits // required here
 func init() {
 	setServiceName(&BaseSettings)
 	setStartedAt(&BaseSettings)
