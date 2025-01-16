@@ -2,6 +2,9 @@ package settings_utils
 
 import (
 	"context"
+	"github.com/pkg/errors"
+	"os"
+	"regexp"
 	"time"
 )
 
@@ -29,8 +32,9 @@ type metricsSettings struct {
 }
 
 type baseSettings struct {
-	Release   bool      `env:"RELEASE"    envDefault:"true"`
-	StartedAt time.Time `env:"START_TIME" envDefault:""`
+	Release     bool      `env:"RELEASE"    envDefault:"true"`
+	StartedAt   time.Time `env:"START_TIME" envDefault:""`
+	ServiceName string    `env:"SERVICE_NAME" envDefault:""`
 
 	Log     logSettings     `envPrefix:"LOG__"`
 	Prof    profSettings    `envPrefix:"PROF__"`
@@ -44,9 +48,39 @@ func (r *baseSettings) Uptime() time.Duration {
 //nolint:gochecknoglobals // need this
 var BaseSettings = MustInitSetting[baseSettings](context.Background(), "BASE_")
 
-//nolint: gochecknoinits // required here
-func init() {
-	if BaseSettings.StartedAt.IsZero() {
-		BaseSettings.StartedAt = time.Now().UTC()
+func setServiceName(settings *baseSettings) {
+	if settings.ServiceName != "" {
+		return
 	}
+
+	hostName := os.Getenv("HOSTNAME")
+	if hostName == "" {
+		settings.ServiceName = "undefined"
+		return
+	}
+
+	kubepodNameRegexp, err := regexp.Compile(`^(.+)-\w+-\w+$`)
+	if err != nil {
+		panic(errors.Wrap(err, "failed to compile kubepod name regexp"))
+	}
+
+	foundString := kubepodNameRegexp.FindStringSubmatch(hostName)
+	if len(foundString) == 2 {
+		settings.ServiceName = foundString[1]
+		return
+	}
+
+	settings.ServiceName = hostName
+}
+
+func setStartedAt(settings *baseSettings) {
+	if settings.StartedAt.IsZero() {
+		settings.StartedAt = time.Now().UTC()
+	}
+}
+
+// nolint: gochecknoinits // required here
+func init() {
+	setServiceName(&BaseSettings)
+	setStartedAt(&BaseSettings)
 }
