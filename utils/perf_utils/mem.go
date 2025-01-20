@@ -23,22 +23,23 @@ func LogMemUsage(ctx context.Context) {
 	runtime.ReadMemStats(&m)
 
 	zerolog.Ctx(ctx).Error().
-		Float64("stop.the.world.ms", conv_utils.ToMega(m.PauseTotalNs)).
-		Float64("heap.alloc.mb", conv_utils.ToMegaByte(m.HeapAlloc)).
-		Float64("cum.heap.alloc.mb", conv_utils.ToMegaByte(m.TotalAlloc)).
-		Float64("heap.alloc.count.k", conv_utils.ToKilo(m.HeapObjects)).
-		Float64("stack.in.use.mb", conv_utils.ToMegaByte(m.StackInuse)).
-		Float64("total.sys.mb", conv_utils.ToMegaByte(m.Sys)).
+		Str("stop.the.world", time.Duration(m.PauseTotalNs).String()).
+		Str("heap.alloc", conv_utils.Closest(m.HeapAlloc)).
+		Str("cum.heap.alloc", conv_utils.Closest(m.TotalAlloc)).
+		Str("heap.alloc.count", conv_utils.Closest(m.HeapObjects)).
+		Str("stack.in.use", conv_utils.ClosestByte(m.StackInuse)).
+		Str("total.sys.mb", conv_utils.ClosestByte(m.Sys)).
 		//nolint: mnd // its percent and precision
 		Float64("gc.cpu.percent", conv_utils.ToFixed(m.GCCPUFraction*100, 4)).
 		Uint32("gc.cycles", m.NumGC).
-		Float64("total.mem.mb", conv_utils.ToMegaByte(totalBytes)).
+		Str("total.mem", conv_utils.ClosestByte(totalBytes)).
 		Int("goroutine.count", runtime.NumGoroutine()).
 		Msg("perfstats")
 }
 
 func SpamLogMemUsage(ctx context.Context, d time.Duration) {
 	t := time.NewTicker(d)
+
 	for {
 		select {
 		case <-ctx.Done():

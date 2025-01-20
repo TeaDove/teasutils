@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	thousand         = 1000
+	thousand         = 1000.0
 	binaryThousand   = 1024
 	defaultPrecision = 2
 )
@@ -49,31 +49,31 @@ func ToGigaByte[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand
 }
 
-func ClosestByteAndK[T constraints.Integer | constraints.Float](bytes T) (float64, uint) {
-	if float64(bytes) <= binaryThousand {
-		return float64(bytes), 0 // B
+func closestByteAndK(v float64) (float64, uint) {
+	if v <= binaryThousand {
+		return v, 0 // B
 	}
 
-	if float64(bytes) <= binaryThousand*binaryThousand {
-		return float64(bytes) / binaryThousand, 1 // KB
+	if v <= binaryThousand*binaryThousand {
+		return v / binaryThousand, 1 // KB
 	}
 
-	if float64(bytes) <= binaryThousand*binaryThousand*binaryThousand {
+	if v <= binaryThousand*binaryThousand*binaryThousand {
 		//nolint: mnd // go fuck yourself
-		return float64(bytes) / binaryThousand / binaryThousand, 2 // MB
+		return v / binaryThousand / binaryThousand, 2 // MB
 	}
 
-	if float64(bytes) <= binaryThousand*binaryThousand*binaryThousand*binaryThousand {
+	if v <= binaryThousand*binaryThousand*binaryThousand*binaryThousand {
 		//nolint: mnd // go fuck yourself
-		return float64(bytes) / binaryThousand / binaryThousand / binaryThousand, 3 // GB
+		return v / binaryThousand / binaryThousand / binaryThousand, 3 // GB
 	}
 
 	//nolint: mnd // go fuck yourself
-	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand / binaryThousand, 4 // TB
+	return v / binaryThousand / binaryThousand / binaryThousand / binaryThousand, 4 // TB
 }
 
 func ClosestByteWithPrecision[T constraints.Integer | constraints.Float](bytes T, precision int) string {
-	rounded, pow := ClosestByteAndK(bytes)
+	rounded, pow := closestByteAndK(float64(bytes))
 
 	var digit string
 
@@ -82,7 +82,7 @@ func ClosestByteWithPrecision[T constraints.Integer | constraints.Float](bytes T
 		digit = "B"
 
 	case 1:
-		digit = "KB"
+		digit = "kB"
 	//nolint: mnd // go fuck yourself
 	case 2:
 		digit = "MB"
@@ -102,4 +102,77 @@ func ClosestByteWithPrecision[T constraints.Integer | constraints.Float](bytes T
 
 func ClosestByte[T constraints.Integer | constraints.Float](bytes T) string {
 	return ClosestByteWithPrecision(bytes, defaultPrecision)
+}
+
+func closestK(v float64) (float64, int) {
+	if v <= (1 / (thousand * thousand)) {
+		return v * thousand * thousand * thousand, -3 // Nano
+	}
+
+	if v <= (1 / thousand) {
+		return v * thousand * thousand, -2 // Micro
+	}
+
+	if v <= 1 {
+		return v * thousand, -1 // Milli
+	}
+
+	if v <= thousand {
+		return v, 0 // B
+	}
+
+	if v <= thousand*thousand {
+		return v / thousand, 1 // KB
+	}
+
+	if v <= thousand*thousand*thousand {
+		//nolint: mnd // go fuck yourself
+		return v / thousand / thousand, 2 // MB
+	}
+
+	if v <= thousand*thousand*thousand*thousand {
+		//nolint: mnd // go fuck yourself
+		return v / thousand / thousand / thousand, 3 // GB
+	}
+
+	//nolint: mnd // go fuck yourself
+	return v / thousand / thousand / thousand / thousand, 4 // TB
+}
+
+func ClosestKWithPrecision[T constraints.Integer | constraints.Float](v T, precision int) string {
+	rounded, pow := closestK(float64(v))
+
+	var digit string
+
+	switch pow {
+	case -3:
+		digit = " n"
+	case -2:
+		digit = " µ"
+	case -1:
+		digit = " m"
+	case 0:
+		digit = ""
+
+	case 1:
+		digit = " k"
+	//nolint: mnd // go fuck yourself
+	case 2:
+		digit = " M"
+	//nolint: mnd // go fuck yourself
+	case 3:
+		digit = " G"
+	default:
+		digit = " T"
+	}
+
+	return fmt.Sprintf(
+		"%s%s",
+		strconv.FormatFloat(ToFixed(rounded, precision), 'f', -1, 64),
+		digit,
+	)
+}
+
+func Closest[T constraints.Integer | constraints.Float](v T) string {
+	return ClosestKWithPrecision(v, defaultPrecision)
 }

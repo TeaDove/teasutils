@@ -28,11 +28,27 @@ func TestUnit_Converters_SystemCToClosestByteAsString_Ok(t *testing.T) {
 	t.Parallel()
 
 	assert.Equal(t, "15 B", ClosestByte(15))
-	assert.Equal(t, "1.46 KB", ClosestByte(1500))
-	assert.Equal(t, "14.65 KB", ClosestByte(15000))
+	assert.Equal(t, "1.46 kB", ClosestByte(1500))
+	assert.Equal(t, "14.65 kB", ClosestByte(15000))
 	assert.Equal(t, "1.43 MB", ClosestByte(1500000))
 	assert.Equal(t, "14.31 MB", ClosestByte(15000000))
 	assert.Equal(t, "143.05 MB", ClosestByte(150000000))
 	assert.Equal(t, "1.4 GB", ClosestByte(1500000000))
 	assert.Equal(t, "139.7 GB", ClosestByte(150000000000))
+}
+
+func TestUnit_Converters_SystemCToClosestKAsString_Ok(t *testing.T) {
+	t.Parallel()
+
+	assert.Equal(t, "1.5 n", Closest(0.0000000015))
+	assert.Equal(t, "1.5 µ", Closest(0.0000015))
+	assert.Equal(t, "15 m", Closest(0.015))
+	assert.Equal(t, "15", Closest(15))
+	assert.Equal(t, "1.5 k", Closest(1500))
+	assert.Equal(t, "15 k", Closest(15000))
+	assert.Equal(t, "1.5 M", Closest(1500000))
+	assert.Equal(t, "15 M", Closest(15000000))
+	assert.Equal(t, "150 M", Closest(150000000))
+	assert.Equal(t, "1.5 G", Closest(1500000000))
+	assert.Equal(t, "150 G", Closest(150000000000))
 }
