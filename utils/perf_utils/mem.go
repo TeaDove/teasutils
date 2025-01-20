@@ -37,9 +37,14 @@ func LogMemUsage(ctx context.Context) {
 		Msg("perfstats")
 }
 
-func SpamLogMemUsage(ctx context.Context, rate time.Duration) {
+func SpamLogMemUsage(ctx context.Context, d time.Duration) {
+	t := time.NewTicker(d)
 	for {
-		LogMemUsage(ctx)
-		time.Sleep(rate)
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			LogMemUsage(ctx)
+		}
 	}
 }

@@ -20,8 +20,8 @@ type logSettings struct {
 type profSettings struct {
 	Enabled            bool          `env:"ENABLED"               envDefault:"false"`
 	ResultFilename     string        `env:"RESULT_FILENAME"       envDefault:"cpu.prof"`
-	SpamMemUsage       bool          `env:"SPAM_MEM_USAGE"        envDefault:"true"`
-	SpamMemUsagePeriod time.Duration `env:"SPAM_MEM_USAGE_PERIOD" envDefault:"1s"`
+	SpamMemUsage       bool          `env:"SPAM_MEM_USAGE"        envDefault:"false"`
+	SpamMemUsagePeriod time.Duration `env:"SPAM_MEM_USAGE_PERIOD" envDefault:"5s"`
 }
 
 type metricsSettings struct {

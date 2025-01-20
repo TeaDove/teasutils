@@ -33,13 +33,6 @@ type Container interface {
 }
 
 func withProfiler(ctx context.Context) error {
-	if settings_utils.BaseSettings.Prof.SpamMemUsage {
-		go perf_utils.SpamLogMemUsage(ctx, settings_utils.BaseSettings.Prof.SpamMemUsagePeriod)
-		zerolog.Ctx(ctx).Warn().
-			Str("period", settings_utils.BaseSettings.Prof.SpamMemUsagePeriod.String()).
-			Msg("spam.memory.usage.added")
-	}
-
 	file, err := os.Create(settings_utils.BaseSettings.Prof.ResultFilename)
 	if err != nil {
 		return errors.Wrap(err, "could not open result file")
@@ -79,6 +72,14 @@ func BuildFromSettings[T Container](
 	ctx context.Context,
 	builder func(ctx context.Context) (T, error),
 ) (T, error) {
+	if settings_utils.BaseSettings.Prof.SpamMemUsage {
+		go perf_utils.SpamLogMemUsage(ctx, settings_utils.BaseSettings.Prof.SpamMemUsagePeriod)
+		zerolog.Ctx(ctx).
+			Warn().
+			Str("period", settings_utils.BaseSettings.Prof.SpamMemUsagePeriod.String()).
+			Msg("spam.memory.usage.added")
+	}
+
 	if settings_utils.BaseSettings.Prof.Enabled {
 		err := withProfiler(ctx)
 		if err != nil {
