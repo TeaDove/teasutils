@@ -22,7 +22,8 @@ func LogMemUsage(ctx context.Context) {
 
 	runtime.ReadMemStats(&m)
 
-	zerolog.Ctx(ctx).Error().
+	zerolog.Ctx(ctx).
+		Info().
 		Str("stop.the.world", time.Duration(m.PauseTotalNs).String()).
 		Str("heap.alloc", conv_utils.Closest(m.HeapAlloc)).
 		Str("cum.heap.alloc", conv_utils.Closest(m.TotalAlloc)).

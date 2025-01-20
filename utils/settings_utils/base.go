@@ -21,7 +21,7 @@ type profSettings struct {
 	Enabled            bool          `env:"ENABLED"               envDefault:"false"`
 	ResultFilename     string        `env:"RESULT_FILENAME"       envDefault:"cpu.prof"`
 	SpamMemUsage       bool          `env:"SPAM_MEM_USAGE"        envDefault:"false"`
-	SpamMemUsagePeriod time.Duration `env:"SPAM_MEM_USAGE_PERIOD" envDefault:"5s"`
+	SpamMemUsagePeriod time.Duration `env:"SPAM_MEM_USAGE_PERIOD" envDefault:"15s"`
 }
 
 type metricsSettings struct {
@@ -76,7 +76,7 @@ func setStartedAt(settings *baseSettings) {
 	}
 }
 
-//nolint: gochecknoinits // required here
+// nolint: gochecknoinits // required here
 func init() {
 	setServiceName(&BaseSettings)
 	setStartedAt(&BaseSettings)
