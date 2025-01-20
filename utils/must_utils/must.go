@@ -15,3 +15,11 @@ func MustNoReturn(err error) {
 		panic(fmt.Errorf("must failed: %w", err))
 	}
 }
+
+func Unwrap[T any](obj T, ok bool) T {
+	if !ok {
+		panic("unwrap failed")
+	}
+
+	return obj
+}
