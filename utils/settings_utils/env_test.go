@@ -1,9 +1,10 @@
 package settings_utils
 
 import (
-	"context"
 	"os"
 	"testing"
+
+	"github.com/teadove/teasutils/utils/test_utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +18,7 @@ func TestUnit_Settings_Init_Ok(t *testing.T) {
 
 	t.Setenv("teas_user", "julia")
 
-	settings, err := InitSetting[Settings](context.Background(), "teas_", "password")
+	settings, err := InitSetting[Settings](test_utils.GetLoggedContext(), "teas_", "password")
 	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 }
@@ -37,7 +38,7 @@ func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 	_, err = file.WriteString(`teas_user=julia`)
 	require.NoError(t, err)
 
-	settings, err := InitSetting[Settings](context.Background(), "teas_", "password")
+	settings, err := InitSetting[Settings](test_utils.GetLoggedContext(), "teas_", "password")
 	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 
@@ -61,7 +62,7 @@ func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Panics(t, func() {
-		_, _ = InitSetting[Settings](context.Background(), "teas_", "password")
+		_, _ = InitSetting[Settings](test_utils.GetLoggedContext(), "teas_", "password")
 	})
 
 	err = os.Remove(envFile)
@@ -76,7 +77,7 @@ func TestUnit_Settings_TimeSetted_Ok(t *testing.T) {
 func TestUnit_Settings_SetServiceName_Ok(t *testing.T) {
 	t.Setenv("HOSTNAME", "device-get-event-bf6ff5d47-qbs4f")
 
-	settings := MustInitSetting[baseSettings](context.Background(), "BASE_")
+	settings := MustInitSetting[baseSettings](test_utils.GetLoggedContext(), "BASE_")
 	setServiceName(&settings)
 
 	assert.Equal(t, "device-get-event", settings.ServiceName)

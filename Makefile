@@ -1,9 +1,6 @@
 GO ?= GO111MODULE=on CGO_ENABLED=0 go
 VERSION ?= $(shell cat VERSION)
 
-update-all:
-	$(GO) get -u ./...
-
 tag:
 	git tag $(VERSION)
 	git push origin --tags

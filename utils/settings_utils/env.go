@@ -2,10 +2,12 @@ package settings_utils
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"syscall"
+
+	"github.com/teadove/teasutils/utils/json_utils"
+	"github.com/teadove/teasutils/utils/redact_utils"
 
 	"github.com/teadove/teasutils/utils/must_utils"
 
@@ -13,9 +15,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/utils/redact_utils"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 )
 
 const (
@@ -63,27 +62,12 @@ func InitSetting[T any](
 		return *new(T), errors.Wrap(err, "failed to env parse")
 	}
 
-	settingsJSON, err := json.Marshal(settings)
-	if err != nil {
-		return *new(T), errors.Wrap(err, "failed to marshal settings")
-	}
-
-	for _, valueKey := range omitFromLogValues {
-		res := gjson.GetBytes(settingsJSON, valueKey)
-
-		settingsJSON, err = sjson.SetBytes(
-			settingsJSON,
-			valueKey,
-			redact_utils.RedactWithPrefix(res.String()),
-		)
-		if err != nil {
-			return *new(T), errors.Wrap(err, "failed to redact settings")
-		}
-	}
-
 	zerolog.Ctx(ctx).
 		Debug().
-		RawJSON("v", settingsJSON).
+		RawJSON("v", redact_utils.RedactJSONWithPrefix(
+			ctx,
+			json_utils.MarshalOrWarn(ctx, settings), omitFromLogValues...),
+		).
 		Msg("settings.loaded")
 
 	return settings, nil
