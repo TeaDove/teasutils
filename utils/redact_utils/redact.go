@@ -44,10 +44,16 @@ func RedactJSONWithPrefix(ctx context.Context, s []byte, paths ...string) []byte
 	var (
 		err      error
 		redacted = slices.Clone(s)
+		v        string
 	)
 
 	for _, path := range paths {
-		redacted, err = sjson.SetBytes(redacted, path, RedactWithPrefix(gjson.GetBytes(redacted, path).String()))
+		v = gjson.GetBytes(redacted, path).String()
+		if v == "" {
+			continue
+		}
+
+		redacted, err = sjson.SetBytes(redacted, path, RedactWithPrefix(v))
 		if err != nil {
 			zerolog.Ctx(ctx).
 				Warn().

@@ -57,7 +57,7 @@ func TestUnit_RedactUtils_RedactJSONWithPrefix_Ok(t *testing.T) {
 "user":{"name":"TeaDove","password":"[REDACTED:12345...:9]","phone":"[REDACTED:12345...:9]"}}`,
 		string(RedactJSONWithPrefix(ctx,
 			json_utils.MarshalOrWarn(ctx, values),
-			"user.password", "user.phone", "db.password",
+			"user.password", "user.phone", "db.password", "undefined",
 		)),
 	)
 }
