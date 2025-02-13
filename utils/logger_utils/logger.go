@@ -26,7 +26,9 @@ func WithStrContextLog(ctx context.Context, key string, value string) context.Co
 	return zerolog.Ctx(ctx).With().Str(key, value).Ctx(ctx).Logger().WithContext(ctx)
 }
 
-func humanMarshalStack(err error) any {
+func printedMarshalStack(err error) any {
+	err = errors.WithStack(err)
+
 	type stackTracer interface {
 		StackTrace() errors.StackTrace
 	}
@@ -37,19 +39,38 @@ func humanMarshalStack(err error) any {
 	}
 
 	stack := e.StackTrace()
-	formatted := ""
 
 	for _, frame := range stack {
-		formatted += fmt.Sprintf("%+v\n", frame)
+		//nolint: forbidigo // only exception
+		fmt.Printf("%+v\n", frame)
 	}
 
-	return formatted
+	return "up"
+}
+
+func jsonMarshalStack(err error) any {
+	err = errors.WithStack(err)
+
+	type stackTracer interface {
+		StackTrace() errors.StackTrace
+	}
+
+	e, ok := err.(stackTracer)
+	if !ok {
+		return nil
+	}
+
+	stack := e.StackTrace()
+	v := strings.Builder{}
+
+	for _, frame := range stack {
+		v.WriteString(fmt.Sprintf("%+v\n", frame))
+	}
+
+	return v.String()
 }
 
 func makeLogger() zerolog.Logger {
-	//nolint: reassign // Need this
-	zerolog.ErrorStackMarshaler = humanMarshalStack
-
 	level := must_utils.Must(zerolog.ParseLevel(settings_utils.BaseSettings.Log.Level))
 
 	logger := zerolog.New(os.Stderr).
@@ -61,6 +82,11 @@ func makeLogger() zerolog.Logger {
 
 	if strings.EqualFold(settings_utils.BaseSettings.Log.Factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+		//nolint: reassign // TODO find better solution
+		zerolog.ErrorStackMarshaler = printedMarshalStack
+	} else {
+		//nolint: reassign // TODO find better solution
+		zerolog.ErrorStackMarshaler = jsonMarshalStack
 	}
 
 	logger.Trace().Str("logLevel", level.String()).Msg("logger.initiated")

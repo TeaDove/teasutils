@@ -17,6 +17,7 @@ func TestUnit_LoggerUtils_ErrorWithStackrace_Ok(t *testing.T) {
 	ctx := NewLoggedCtx()
 
 	zerolog.Ctx(ctx).Error().Stack().Err(err).Msg("error")
+	zerolog.Ctx(ctx).Error().Err(err).Msg("error")
 }
 
 func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
