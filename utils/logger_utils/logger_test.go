@@ -30,7 +30,7 @@ func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
 	err := errors.WithStack(errors.New("test error"))
 	ctx := NewLoggedCtx()
 
-	ctx = WithStrContextLog(ctx, "userId", "123")
+	ctx = WithValue(ctx, "userId", "123")
 
 	ctx = logger.WithContext(ctx)
 
@@ -46,4 +46,21 @@ func TestUnit_LoggerUtils_Panic_Ok(t *testing.T) {
 	assert.Panics(t, func() {
 		zerolog.Ctx(ctx).Panic().Stack().Err(err).Msg("error")
 	})
+}
+
+func TestUnit_LoggerUtils_ReadWriteCtx_Ok(t *testing.T) {
+	t.Parallel()
+
+	ctx := NewLoggedCtx()
+
+	ctx = WithReadableValue(ctx, "userId", "123")
+	act := ReadValue(ctx, "userId")
+	assert.Equal(t, "123", act)
+
+	ctx = WithReadableValue(ctx, "appId", "123")
+	act = ReadValue(ctx, "appIdWrong")
+	assert.Equal(t, "", act)
+
+	act = ReadValue(ctx, "somethingOther")
+	assert.Equal(t, "", act)
 }

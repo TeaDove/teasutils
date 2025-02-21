@@ -1,7 +1,6 @@
 package logger_utils
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -13,18 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
-
-func NewLoggedCtx() context.Context {
-	return AddLoggerToCtx(context.Background())
-}
-
-func AddLoggerToCtx(ctx context.Context) context.Context {
-	return globalLogger.With().Logger().WithContext(ctx)
-}
-
-func WithStrContextLog(ctx context.Context, key string, value string) context.Context {
-	return zerolog.Ctx(ctx).With().Str(key, value).Ctx(ctx).Logger().WithContext(ctx)
-}
 
 func printedMarshalStack(err error) any {
 	err = errors.WithStack(err)
