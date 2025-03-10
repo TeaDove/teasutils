@@ -1,10 +1,11 @@
 package settings_utils
 
 import (
-	"github.com/pkg/errors"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -27,6 +28,7 @@ func getRefreshInterval() (time.Duration, error) {
 		refreshIntervalS = 10
 		err              error
 	)
+
 	refreshIntervalSRaw, ok := os.LookupEnv(envFilePathRefreshIntervalS)
 	if ok {
 		refreshIntervalS, err = strconv.Atoi(refreshIntervalSRaw)

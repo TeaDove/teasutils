@@ -2,6 +2,10 @@ package settings_utils
 
 import (
 	"context"
+	"os"
+	"syscall"
+	"time"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -9,9 +13,6 @@ import (
 	"github.com/teadove/teasutils/utils/json_utils"
 	"github.com/teadove/teasutils/utils/must_utils"
 	"github.com/teadove/teasutils/utils/redact_utils"
-	"os"
-	"syscall"
-	"time"
 )
 
 func loadSettings[T any](envPrefix string) (T, error) {
@@ -61,12 +62,14 @@ func GetSettings[T any](
 	omitFromLogValues ...string,
 ) (*T, error) {
 	lastLoad := time.Now().UTC()
+
 	settings, err := loadSettings[T](envPrefix)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load settings")
 	}
 
 	var refreshPeriod time.Duration
+
 	refreshPeriod, err = refresh(ctx, &settings, lastLoad, envPrefix)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to schedule refresher")

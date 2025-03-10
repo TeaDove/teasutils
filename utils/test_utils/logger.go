@@ -2,8 +2,9 @@ package test_utils
 
 import (
 	"context"
-	"github.com/teadove/teasutils/utils/refrect_utils"
 	"os"
+
+	"github.com/teadove/teasutils/utils/refrect_utils"
 
 	"github.com/rs/zerolog"
 )

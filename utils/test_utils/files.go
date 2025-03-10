@@ -7,5 +7,6 @@ func ReadFileOrErr(filename string) string {
 	if err != nil {
 		return err.Error()
 	}
+
 	return string(content)
 }
