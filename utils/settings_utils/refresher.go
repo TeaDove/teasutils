@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/fs"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -11,8 +12,8 @@ import (
 )
 
 func refresh[T any](ctx context.Context, settings *T, loadedAt time.Time, envPrefix string) (time.Duration, error) {
-	refreshEnabled := os.Getenv(envFilePathRefreshEnabled)
-	if refreshEnabled != "true" {
+	refreshIntervalSRaw, ok := os.LookupEnv(envFilePathRefreshIntervalS)
+	if !ok {
 		return 0, nil
 	}
 
@@ -27,16 +28,18 @@ func refresh[T any](ctx context.Context, settings *T, loadedAt time.Time, envPre
 		return 0, errors.Wrap(err, "failed to check if file exists")
 	}
 
-	period, err := getRefreshInterval()
+	refreshIntervalS, err := strconv.Atoi(refreshIntervalSRaw)
 	if err != nil {
-		return 0, errors.Wrap(err, "failed to get refresh interval")
+		return 0, errors.Wrap(err, "invalid refresh interval")
 	}
 
-	var newSettings T
+	var (
+		newSettings T
+		period      = time.Duration(refreshIntervalS) * time.Second
+		ticker      = time.NewTimer(period)
+	)
 
 	go func() {
-		ticker := time.NewTimer(period)
-
 		for range ticker.C {
 			file, err = os.Stat(filePath)
 			if err != nil {

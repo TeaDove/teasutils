@@ -83,7 +83,6 @@ func TestUnit_Settings_SetServiceName_Ok(t *testing.T) {
 }
 
 func TestUnit_Settings_Refresh_Ok(t *testing.T) {
-	t.Setenv(envFilePathRefreshEnabled, "true")
 	t.Setenv(envFilePathRefreshIntervalS, "1")
 	writeToEnvFile(t, `BASE_RELEASE=false`)
 
