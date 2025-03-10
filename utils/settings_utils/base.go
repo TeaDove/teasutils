@@ -45,8 +45,9 @@ func (r *baseSettings) Uptime() time.Duration {
 }
 
 //nolint:gochecknoglobals // need this
-var BaseSettings = MustInitSetting[baseSettings](context.Background(), "BASE_")
+var BaseSettings = MustGetSetting[baseSettings](context.Background(), "BASE_")
 
+// TODO add hooks
 func setServiceName(settings *baseSettings) {
 	if settings.ServiceName != "" {
 		return
@@ -59,6 +60,7 @@ func setServiceName(settings *baseSettings) {
 	}
 
 	foundString := regexp.MustCompile(`^(.+)-\w+-\w+$`).FindStringSubmatch(hostName)
+	// TODO make for sfs
 
 	const maxAllowedGroups = 2
 
@@ -76,8 +78,8 @@ func setStartedAt(settings *baseSettings) {
 	}
 }
 
-//nolint: gochecknoinits // required here
+// nolint: gochecknoinits // required here
 func init() {
-	setServiceName(&BaseSettings)
-	setStartedAt(&BaseSettings)
+	setServiceName(BaseSettings)
+	setStartedAt(BaseSettings)
 }

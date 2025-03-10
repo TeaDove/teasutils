@@ -2,6 +2,7 @@ package test_utils
 
 import (
 	"context"
+	"github.com/teadove/teasutils/utils/refrect_utils"
 	"os"
 
 	"github.com/rs/zerolog"
@@ -17,4 +18,19 @@ func GetLoggedContext() context.Context {
 	logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	return logger.With().Logger().WithContext(context.Background())
+}
+
+// LogAny
+//
+// Logs everything, only for debug purposes.
+func LogAny(values ...any) {
+	arr := zerolog.Arr()
+	for _, value := range values {
+		arr.Dict(
+			zerolog.Dict().
+				Interface(refrect_utils.GetTypesStringRepresentation(value), value),
+		)
+	}
+
+	zerolog.Ctx(GetLoggedContext()).Info().Array("items", arr).Msg("logging.any")
 }

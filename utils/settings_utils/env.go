@@ -2,26 +2,37 @@ package settings_utils
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"syscall"
-
-	"github.com/teadove/teasutils/utils/json_utils"
-	"github.com/teadove/teasutils/utils/redact_utils"
-
-	"github.com/teadove/teasutils/utils/must_utils"
-
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+	"github.com/teadove/teasutils/utils/json_utils"
+	"github.com/teadove/teasutils/utils/must_utils"
+	"github.com/teadove/teasutils/utils/redact_utils"
+	"os"
+	"syscall"
+	"time"
 )
 
-const (
-	envFile = ".env"
-)
+func loadSettings[T any](envPrefix string) (T, error) {
+	// Dangerous place! Dotenv files will override any set ENV settings!
+	err := godotenv.Overload(getFilePath())
+	if err != nil {
+		var pathErr *os.PathError
+		if !(errors.As(err, &pathErr) && errors.Is(pathErr.Err, syscall.ENOENT)) {
+			return *new(T), errors.Wrap(err, "failed to load dotenv file")
+		}
+	}
 
-// InitSetting
+	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
+	if err != nil {
+		return *new(T), errors.Wrap(err, "failed to env parse")
+	}
+
+	return settings, nil
+}
+
+// GetSettings
 // Initialize settings, example:
 //
 //		 type tg struct {
@@ -44,39 +55,43 @@ const (
 //		 var Settings baseSettings
 //
 // Panics if dotEnv file found, but corrupted.
-func InitSetting[T any](
+func GetSettings[T any](
 	ctx context.Context,
 	envPrefix string,
 	omitFromLogValues ...string,
-) (T, error) {
-	err := godotenv.Load(envFile)
+) (*T, error) {
+	lastLoad := time.Now().UTC()
+	settings, err := loadSettings[T](envPrefix)
 	if err != nil {
-		var pathErr *os.PathError
-		if !(errors.As(err, &pathErr) && errors.Is(pathErr.Err, syscall.ENOENT)) {
-			panic(fmt.Sprintf("failed to load dotenv file %s: %v", envFile, err))
-		}
+		return nil, errors.Wrap(err, "failed to load settings")
 	}
 
-	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
+	var refreshPeriod time.Duration
+	refreshPeriod, err = refresh(ctx, &settings, lastLoad, envPrefix)
 	if err != nil {
-		return *new(T), errors.Wrap(err, "failed to env parse")
+		return nil, errors.Wrap(err, "failed to schedule refresher")
 	}
 
-	zerolog.Ctx(ctx).
+	prelog := zerolog.Ctx(ctx).
 		Debug().
 		RawJSON("v", redact_utils.RedactJSONWithPrefix(
 			ctx,
 			json_utils.MarshalOrWarn(ctx, settings), omitFromLogValues...),
-		).
-		Msg("settings.loaded")
+		)
 
-	return settings, nil
+	if refreshPeriod > 0 {
+		prelog = prelog.Str("refresh_period", refreshPeriod.String())
+	}
+
+	prelog.Msg("settings.loaded")
+
+	return &settings, nil
 }
 
-func MustInitSetting[T any](
+func MustGetSetting[T any](
 	ctx context.Context,
 	envPrefix string,
 	omitFromLogValues ...string,
-) T {
-	return must_utils.Must(InitSetting[T](ctx, envPrefix, omitFromLogValues...))
+) *T {
+	return must_utils.Must(GetSettings[T](ctx, envPrefix, omitFromLogValues...))
 }
