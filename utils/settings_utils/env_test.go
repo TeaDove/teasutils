@@ -26,13 +26,13 @@ func writeToEnvFile(t *testing.T, v string) {
 
 func TestUnit_Settings_Init_Ok(t *testing.T) {
 	type Settings struct {
-		User     string `env:"user"     envDefault:"masha"               json:"user"`
-		Password string `env:"password" envDefault:"thebestpasswordever" json:"password"`
+		User     string `env:"user"     envDefault:"masha"                             json:"user"`
+		Password string `env:"password" envDefault:"thebestpasswordeverveeeeeeerylong" json:"password"`
 	}
 
 	t.Setenv("teas_user", "julia")
 
-	settings, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_", "password")
+	settings, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_")
 	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 }
@@ -46,7 +46,7 @@ func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 
 	writeToEnvFile(t, `teas_user=julia`)
 
-	settings, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_", "password")
+	settings, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_")
 	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 
@@ -62,7 +62,7 @@ func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 
 	writeToEnvFile(t, `teas_user;julia`)
 
-	_, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_", "password")
+	_, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_")
 	require.Error(t, err)
 
 	_ = os.Remove(getFilePath())

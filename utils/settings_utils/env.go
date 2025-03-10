@@ -56,11 +56,7 @@ func loadSettings[T any](envPrefix string) (T, error) {
 //		 var Settings baseSettings
 //
 // Panics if dotEnv file found, but corrupted.
-func GetSettings[T any](
-	ctx context.Context,
-	envPrefix string,
-	omitFromLogValues ...string,
-) (*T, error) {
+func GetSettings[T any](ctx context.Context, envPrefix string) (*T, error) {
 	lastLoad := time.Now().UTC()
 
 	settings, err := loadSettings[T](envPrefix)
@@ -77,10 +73,7 @@ func GetSettings[T any](
 
 	prelog := zerolog.Ctx(ctx).
 		Debug().
-		RawJSON("v", redact_utils.RedactJSONWithPrefix(
-			ctx,
-			json_utils.MarshalOrWarn(ctx, settings), omitFromLogValues...),
-		)
+		RawJSON("v", redact_utils.RedactLongStrings(json_utils.MarshalOrWarn(ctx, settings)))
 
 	if refreshPeriod > 0 {
 		prelog = prelog.Str("refresh_period", refreshPeriod.String())
@@ -91,10 +84,6 @@ func GetSettings[T any](
 	return &settings, nil
 }
 
-func MustGetSetting[T any](
-	ctx context.Context,
-	envPrefix string,
-	omitFromLogValues ...string,
-) *T {
-	return must_utils.Must(GetSettings[T](ctx, envPrefix, omitFromLogValues...))
+func MustGetSetting[T any](ctx context.Context, envPrefix string) *T {
+	return must_utils.Must(GetSettings[T](ctx, envPrefix))
 }
