@@ -7,11 +7,18 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/wI2L/jsondiff"
+
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
-func refresh[T any](ctx context.Context, settings *T, loadedAt time.Time, envPrefix string) (time.Duration, error) {
+func refresh[T any]( //nolint: gocognit // TODO refactor
+	ctx context.Context,
+	settings *T,
+	loadedAt time.Time,
+	envPrefix string,
+) (time.Duration, error) {
 	refreshIntervalSRaw, ok := os.LookupEnv(envFilePathRefreshIntervalS)
 	if !ok {
 		return 0, nil
@@ -36,7 +43,7 @@ func refresh[T any](ctx context.Context, settings *T, loadedAt time.Time, envPre
 	var (
 		newSettings T
 		period      = time.Duration(refreshIntervalS) * time.Second
-		ticker      = time.NewTimer(period)
+		ticker      = time.NewTicker(period)
 	)
 
 	go func() {
@@ -52,7 +59,7 @@ func refresh[T any](ctx context.Context, settings *T, loadedAt time.Time, envPre
 				continue
 			}
 
-			if file.ModTime().Before(loadedAt) {
+			if file.ModTime() == loadedAt {
 				continue
 			}
 
@@ -61,14 +68,27 @@ func refresh[T any](ctx context.Context, settings *T, loadedAt time.Time, envPre
 				zerolog.Ctx(ctx).Error().Stack().Err(err).Msg("env.setting.error")
 			}
 
-			*settings = newSettings
+			var patch jsondiff.Patch
 
-			// TODO log only diff
-			zerolog.Ctx(ctx).
-				Info().
-				Str("file", filePath).
-				Interface("new_settings", newSettings).
-				Msg("settings.refreshed")
+			patch, err = jsondiff.Compare(settings, newSettings)
+			if err != nil {
+				zerolog.Ctx(ctx).
+					Error().
+					Stack().Err(err).
+					Msg("err.checking.diff")
+			}
+
+			if len(patch) != 0 || err != nil {
+				*settings = newSettings
+
+				zerolog.Ctx(ctx).
+					Info().
+					Str("file", filePath).
+					RawJSON("patch", []byte(patch.String())).
+					Msg("settings.refreshed")
+			}
+
+			loadedAt = file.ModTime()
 		}
 	}()
 

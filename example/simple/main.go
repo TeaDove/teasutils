@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/teadove/teasutils/utils/json_utils"
+	"time"
+
+	"github.com/rs/zerolog"
+
 	"github.com/teadove/teasutils/utils/logger_utils"
 	"github.com/teadove/teasutils/utils/settings_utils"
-	"time"
 )
 
 type Settings struct {
@@ -16,10 +18,11 @@ func main() {
 	settings := settings_utils.MustGetSetting[Settings](ctx, "SIMPLE_")
 
 	idx := 0
-	for {
-		time.Sleep(2 * time.Second)
-		idx++
-		println(idx, string(json_utils.MarshalOrWarn(ctx, settings)))
-	}
 
+	for {
+		time.Sleep(time.Second)
+
+		idx++
+		zerolog.Ctx(ctx).Info().Int("idx", idx).Interface("settings", settings).Msg("hello world")
+	}
 }
