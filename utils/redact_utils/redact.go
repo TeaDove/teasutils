@@ -17,11 +17,15 @@ const (
 )
 
 func Trim(s string) string {
-	if len(s) <= trimmedMaxLen {
+	return TrimSized(s, trimmedMaxLen)
+}
+
+func TrimSized(s string, maxLen int) string {
+	if len(s) <= maxLen {
 		return fmt.Sprintf("[%s]", s)
 	}
 
-	return fmt.Sprintf("[%s...:%d]", s[:redactedMaxLen], len(s))
+	return fmt.Sprintf("[%s...:%d]", s[:maxLen], len(s))
 }
 
 func Redact(s string) string {
@@ -33,11 +37,15 @@ func Redact(s string) string {
 }
 
 func RedactWithPrefix(s string) string {
-	if len(s) <= redactedMaxLen {
+	return RedactWithPrefixSized(s, redactedMaxLen)
+}
+
+func RedactWithPrefixSized(s string, maxLen int) string {
+	if len(s) <= maxLen {
 		return Redact(s)
 	}
 
-	return fmt.Sprintf("[%s:%s...:%d]", redactedText, s[:redactedMaxLen], len(s))
+	return fmt.Sprintf("[%s:%s...:%d]", redactedText, s[:maxLen], len(s))
 }
 
 func RedactJSONWithPrefix(ctx context.Context, s []byte, paths ...string) []byte {

@@ -13,7 +13,7 @@ const (
 func redactRecursivly(iterableValue gjson.Result, prefix string, result []byte) []byte {
 	iterableValue.ForEach(func(key, value gjson.Result) bool {
 		if value.Type == gjson.String && len(value.Str) > maxLen {
-			newValue := RedactWithPrefix(value.Str)
+			newValue := RedactWithPrefixSized(value.Str, maxLen)
 
 			// Warning!
 			// Possible panic :)

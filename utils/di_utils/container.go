@@ -125,7 +125,7 @@ func BuildFromSettings[T Container](
 		zerolog.Ctx(ctx).
 			Info().
 			Str("elapsed", time.Since(t0).String()).
-			Msg("container.stoped")
+			Msg("container.stopped")
 	})
 
 	zerolog.Ctx(ctx).
