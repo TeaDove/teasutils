@@ -23,6 +23,10 @@ func main() {
 		time.Sleep(time.Second)
 
 		idx++
-		zerolog.Ctx(ctx).Info().Int("idx", idx).Interface("settings", settings).Msg("hello world")
+		zerolog.Ctx(ctx).Info().
+			Int("idx", idx).
+			Interface("settings", settings).
+			Interface("base_settings", settings_utils.BaseSettings).
+			Msg("hello world")
 	}
 }

@@ -14,7 +14,7 @@ import (
 func writeToEnvFile(t *testing.T, v string) {
 	t.Helper()
 
-	filePath := envFilePath
+	filePath := getEnvFilePath()
 	_ = os.Remove(filePath)
 
 	file, err := os.Create(filePath)
@@ -50,7 +50,7 @@ func TestUnit_Settings_InitFromFile_Ok(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "julia", settings.User)
 
-	_ = os.Remove(envFilePath)
+	_ = os.Remove(getEnvFilePath())
 }
 
 //nolint: paralleltest // working with files
@@ -65,7 +65,7 @@ func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 	_, err := GetSettings[Settings](test_utils.GetLoggedContext(), "teas_")
 	require.Error(t, err)
 
-	_ = os.Remove(envFilePath)
+	_ = os.Remove(getEnvFilePath())
 }
 
 //nolint: paralleltest // working with files
@@ -84,8 +84,9 @@ func TestUnit_Settings_SetServiceName_Ok(t *testing.T) {
 
 //nolint: paralleltest // working with files
 func TestUnit_Settings_Refresh_Ok(t *testing.T) {
-	envFileRefreshEnabled = true
-	envFileRefreshInterval = time.Second
+	//nolint: tenv // needs
+	err := os.Setenv("ENV_REFRESH_INTERVAL_S", "1")
+	require.NoError(t, err)
 
 	writeToEnvFile(t, `BASE_RELEASE=false`)
 
@@ -96,5 +97,5 @@ func TestUnit_Settings_Refresh_Ok(t *testing.T) {
 	time.Sleep(2 * time.Second)
 	assert.True(t, settings.Release)
 
-	_ = os.Remove(envFilePath)
+	_ = os.Remove(getEnvFilePath())
 }

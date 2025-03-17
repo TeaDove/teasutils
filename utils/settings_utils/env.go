@@ -17,7 +17,7 @@ import (
 
 func loadSettings[T any](envPrefix string) (T, error) {
 	// Dangerous place! Dotenv files will override any set ENV settings!
-	err := godotenv.Overload(envFilePath)
+	err := godotenv.Overload(getEnvFilePath())
 	if err != nil {
 		var pathErr *os.PathError
 		if !(errors.As(err, &pathErr) && errors.Is(pathErr.Err, syscall.ENOENT)) {
@@ -68,9 +68,9 @@ func GetSettings[T any](ctx context.Context, envPrefix string) (*T, error) {
 		Debug().
 		RawJSON("v", redact_utils.RedactLongStrings(json_utils.MarshalOrWarn(ctx, settings)))
 
-	if envFileRefreshEnabled {
+	if getEnvFileRefreshEnabled() {
 		go refresh(ctx, &settings, lastLoad, envPrefix)
-		prelog.Str("refresh_period", envFileRefreshInterval.String())
+		prelog.Str("refresh_period", getEnvFileRefreshInterval().String())
 	}
 
 	prelog.Msg("settings.loaded")

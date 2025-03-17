@@ -21,19 +21,19 @@ func refresh[T any](
 ) {
 	var (
 		newSettings T
-		period      = envFileRefreshInterval
+		period      = getEnvFileRefreshInterval()
 		ticker      = time.NewTicker(period)
 		file        os.FileInfo
 		err         error
 	)
 
 	for range ticker.C {
-		file, err = os.Stat(envFilePath)
+		file, err = os.Stat(getEnvFilePath())
 		if err != nil {
 			zerolog.Ctx(ctx).
 				Error().Stack().
 				Err(err).
-				Str("file", envFilePath).
+				Str("file", getEnvFilePath()).
 				Msg("failed.to.open.file")
 
 			continue
@@ -63,7 +63,7 @@ func refresh[T any](
 
 			zerolog.Ctx(ctx).
 				Info().
-				Str("file", envFilePath).
+				Str("file", getEnvFilePath()).
 				RawJSON("patch", []byte(patch.String())).
 				Msg("settings.refreshed")
 
