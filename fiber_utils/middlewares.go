@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
@@ -38,16 +39,29 @@ func ErrHandler() func(c *fiber.Ctx, err error) error {
 	}
 }
 
+func RequestIDMiddleware() func(c *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		c.Get(logger_utils.MakeIfEmpty())
+	}
+}
+
 type contextAppender func(c *fiber.Ctx, ctx context.Context) context.Context
 
-func LogCtxMiddleware(logRequest bool, withIP bool, withAPPMethod bool, withUserAgent bool) func(c *fiber.Ctx) error {
+type LogCtxConfig struct {
+	DisableLogRequest bool
+	DisableIP         bool
+	DisableAPPMethod  bool
+	DisableUserAgent  bool
+}
+
+func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 	contexts := make([]contextAppender, 0)
-	if withIP {
+	if !config.DisableIP {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
 			return logger_utils.WithValue(ctx, "ip", c.IP())
 		})
 	}
-	if withAPPMethod {
+	if !config.DisableAPPMethod {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
 			return logger_utils.WithValue(ctx,
 				"app_method",
@@ -59,9 +73,9 @@ func LogCtxMiddleware(logRequest bool, withIP bool, withAPPMethod bool, withUser
 			)
 		})
 	}
-	if withUserAgent {
+	if !config.DisableUserAgent {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
-			return logger_utils.WithValue(ctx, "user_agent", c.Get("User-Agent"))
+			return logger_utils.WithValue(ctx, "user_agent", strings.Clone(c.Get("User-Agent")))
 		})
 	}
 
@@ -74,11 +88,25 @@ func LogCtxMiddleware(logRequest bool, withIP bool, withAPPMethod bool, withUser
 		c.SetUserContext(ctx)
 
 		err := c.Next()
-		if err == nil && logRequest {
-			zerolog.Ctx(ctx).
-				Info().
-				Int("code", c.Response().StatusCode()). // TODO add resp-size and duration
-				Msg("request.processed")
+		if err == nil && !config.DisableLogRequest {
+			statusCode := c.Response().StatusCode()
+			switch {
+			case statusCode < 400:
+				zerolog.Ctx(ctx).
+					Info().
+					Int("code", statusCode). // TODO add resp-size and duration
+					Msg("request.processed")
+			case statusCode < 500:
+				zerolog.Ctx(ctx).
+					Warn().
+					Int("code", statusCode). // TODO add resp-size and duration
+					Msg("request.processed")
+			default:
+				zerolog.Ctx(ctx).
+					Error().
+					Int("code", statusCode). // TODO add resp-size and duration
+					Msg("request.processed")
+			}
 		}
 
 		return err
