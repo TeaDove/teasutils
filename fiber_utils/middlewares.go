@@ -15,7 +15,9 @@ import (
 func ErrHandler() func(c *fiber.Ctx, err error) error {
 	return func(c *fiber.Ctx, err error) error {
 		code := fiber.StatusInternalServerError
+
 		var e *fiber.Error
+
 		if errors.As(err, &e) {
 			code = e.Code
 		}
@@ -35,6 +37,7 @@ func ErrHandler() func(c *fiber.Ctx, err error) error {
 		}
 
 		c.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
+
 		return c.Status(code).SendString(err.Error())
 	}
 }
@@ -55,6 +58,7 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 			return logger_utils.WithValue(ctx, "ip", c.IP())
 		})
 	}
+
 	if !config.DisableAPPMethod {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
 			return logger_utils.WithValue(ctx,
@@ -67,6 +71,7 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 			)
 		})
 	}
+
 	if !config.DisableUserAgent {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
 			return logger_utils.WithValue(ctx, "user_agent", strings.Clone(c.Get("User-Agent")))
@@ -76,7 +81,7 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		ctx := logger_utils.AddLoggerToCtx(c.UserContext())
 		for _, appender := range contexts {
-			ctx = appender(c, ctx)
+			ctx = appender(c, ctx) //nolint: fatcontext // fp
 		}
 
 		c.SetUserContext(ctx)
@@ -84,13 +89,14 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 		err := c.Next()
 		if err == nil && !config.DisableLogRequest {
 			statusCode := c.Response().StatusCode()
+
 			switch {
-			case statusCode < 400:
+			case statusCode < http.StatusBadRequest:
 				zerolog.Ctx(c.UserContext()).
 					Info().
 					Int("code", statusCode). // TODO add resp-size and duration
 					Msg("request.processed")
-			case statusCode < 500:
+			case statusCode < http.StatusInternalServerError:
 				zerolog.Ctx(c.UserContext()).
 					Warn().
 					Int("code", statusCode). // TODO add resp-size and duration
@@ -103,6 +109,6 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 			}
 		}
 
-		return err
+		return err //nolint: wrapcheck // fp
 	}
 }
