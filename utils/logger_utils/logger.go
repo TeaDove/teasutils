@@ -58,7 +58,7 @@ func jsonMarshalStack(err error) any {
 }
 
 func makeLogger() zerolog.Logger {
-	level := must_utils.Must(zerolog.ParseLevel(settings_utils.BaseSettings.Log.Level))
+	level := must_utils.Must(zerolog.ParseLevel(settings_utils.ServiceSettings.Log.Level))
 
 	logger := zerolog.New(os.Stderr).
 		With().
@@ -69,7 +69,7 @@ func makeLogger() zerolog.Logger {
 
 	logger.Hook()
 
-	if strings.EqualFold(settings_utils.BaseSettings.Log.Factory, "CONSOLE") {
+	if strings.EqualFold(settings_utils.ServiceSettings.Log.Factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		//nolint: reassign // TODO find better solution
 		zerolog.ErrorStackMarshaler = printedMarshalStack

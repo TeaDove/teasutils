@@ -30,7 +30,7 @@ type metricsSettings struct {
 	CloseTimeout   time.Duration `env:"CLOSE_TIMEOUT"   envDefault:"10s"`
 }
 
-type baseSettings struct {
+type serviceSettings struct {
 	Release     bool      `env:"RELEASE"      envDefault:"true"`
 	StartedAt   time.Time `env:"START_TIME"   envDefault:""`
 	ServiceName string    `env:"SERVICE_NAME" envDefault:""`
@@ -40,15 +40,15 @@ type baseSettings struct {
 	Metrics metricsSettings `envPrefix:"METRICS__"`
 }
 
-func (r *baseSettings) Uptime() time.Duration {
+func (r *serviceSettings) Uptime() time.Duration {
 	return time.Since(r.StartedAt)
 }
 
 //nolint:gochecknoglobals // need this
-var BaseSettings = MustGetSetting[baseSettings](context.Background(), "BASE_")
+var ServiceSettings = MustGetSetting[serviceSettings](context.Background(), "BASE_")
 
 // TODO add hooks
-func setServiceName(settings *baseSettings) {
+func setServiceName(settings *serviceSettings) {
 	if settings.ServiceName != "" {
 		return
 	}
@@ -72,14 +72,14 @@ func setServiceName(settings *baseSettings) {
 	settings.ServiceName = hostName
 }
 
-func setStartedAt(settings *baseSettings) {
+func setStartedAt(settings *serviceSettings) {
 	if settings.StartedAt.IsZero() {
 		settings.StartedAt = time.Now().UTC()
 	}
 }
 
-//nolint: gochecknoinits // required here
+// nolint: gochecknoinits // required here
 func init() {
-	setServiceName(BaseSettings)
-	setStartedAt(BaseSettings)
+	setServiceName(ServiceSettings)
+	setStartedAt(ServiceSettings)
 }

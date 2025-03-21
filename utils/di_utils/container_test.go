@@ -37,10 +37,10 @@ func (r *TestContainer) Closers() []CloserWithContext {
 	return []CloserWithContext{&testService{}}
 }
 
-//nolint: paralleltest // fails otherwise
+// nolint: paralleltest // fails otherwise
 func TestUnit_DIUtils_MustBuildFromSettingsAndRun_Ok(t *testing.T) {
 	ctx := logger_utils.NewLoggedCtx()
-	settings_utils.BaseSettings.Metrics.URL = "0.0.0.0:8083"
+	settings_utils.ServiceSettings.Metrics.URL = "0.0.0.0:8083"
 
 	container := MustBuildFromSettings[*TestContainer](
 		ctx,
@@ -51,10 +51,10 @@ func TestUnit_DIUtils_MustBuildFromSettingsAndRun_Ok(t *testing.T) {
 	assert.NoError(t, checkFromCheckers(ctx, container.Healths()))
 }
 
-//nolint: paralleltest // fails otherwise
+// nolint: paralleltest // fails otherwise
 func TestUnit_DIUtils_MustBuildFromSettingsStopInf_LogsErr(t *testing.T) {
 	ctx := logger_utils.NewLoggedCtx()
-	settings_utils.BaseSettings.Metrics.URL = "0.0.0.0:8084"
+	settings_utils.ServiceSettings.Metrics.URL = "0.0.0.0:8084"
 
 	container := MustBuildFromSettings[*TestContainer](
 		ctx,
@@ -63,7 +63,7 @@ func TestUnit_DIUtils_MustBuildFromSettingsStopInf_LogsErr(t *testing.T) {
 		},
 	)
 
-	settings_utils.BaseSettings.Metrics.CloseTimeout = time.Second
+	settings_utils.ServiceSettings.Metrics.CloseTimeout = time.Second
 	err := stop(ctx, container)
 	assert.Error(t, err)
 }

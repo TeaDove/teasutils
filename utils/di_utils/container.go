@@ -33,7 +33,7 @@ type Container interface {
 }
 
 func withProfiler(ctx context.Context) error {
-	file, err := os.Create(settings_utils.BaseSettings.Prof.ResultFilename)
+	file, err := os.Create(settings_utils.ServiceSettings.Prof.ResultFilename)
 	if err != nil {
 		return errors.Wrap(err, "could not open result file")
 	}
@@ -51,7 +51,7 @@ func withProfiler(ctx context.Context) error {
 func stop(ctx context.Context, container Container) error {
 	errorsGroup, ctx := errgroup.WithContext(ctx)
 
-	ctx, cancel := context.WithTimeout(ctx, settings_utils.BaseSettings.Metrics.CloseTimeout)
+	ctx, cancel := context.WithTimeout(ctx, settings_utils.ServiceSettings.Metrics.CloseTimeout)
 	defer cancel()
 
 	for _, stoper := range container.Closers() {
@@ -72,15 +72,15 @@ func BuildFromSettings[T Container](
 	ctx context.Context,
 	builder func(ctx context.Context) (T, error),
 ) (T, error) {
-	if settings_utils.BaseSettings.Prof.SpamMemUsage {
-		go perf_utils.SpamLogMemUsage(ctx, settings_utils.BaseSettings.Prof.SpamMemUsagePeriod)
+	if settings_utils.ServiceSettings.Prof.SpamMemUsage {
+		go perf_utils.SpamLogMemUsage(ctx, settings_utils.ServiceSettings.Prof.SpamMemUsagePeriod)
 		zerolog.Ctx(ctx).
 			Warn().
-			Str("period", settings_utils.BaseSettings.Prof.SpamMemUsagePeriod.String()).
+			Str("period", settings_utils.ServiceSettings.Prof.SpamMemUsagePeriod.String()).
 			Msg("spam.memory.usage.added")
 	}
 
-	if settings_utils.BaseSettings.Prof.Enabled {
+	if settings_utils.ServiceSettings.Prof.Enabled {
 		err := withProfiler(ctx)
 		if err != nil {
 			return *new(T), errors.Wrap(err, "failed to add profiler")
@@ -94,7 +94,7 @@ func BuildFromSettings[T Container](
 		return *new(T), errors.Wrap(err, "build container failed")
 	}
 
-	if !settings_utils.BaseSettings.Release {
+	if !settings_utils.ServiceSettings.Release {
 		err = checkFromCheckers(ctx, builtContainer.Healths())
 		if err != nil {
 			return *new(T), errors.Wrap(err, "health check failed")
@@ -109,7 +109,7 @@ func BuildFromSettings[T Container](
 			Debug().
 			Msg("stopping.container")
 
-		if settings_utils.BaseSettings.Prof.Enabled {
+		if settings_utils.ServiceSettings.Prof.Enabled {
 			pprof.StopCPUProfile()
 		}
 

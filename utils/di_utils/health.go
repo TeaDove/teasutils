@@ -13,7 +13,7 @@ import (
 )
 
 func checkFromCheckers(ctx context.Context, checkers []Health) error {
-	ctx, cancel := context.WithTimeout(ctx, settings_utils.BaseSettings.Metrics.RequestTimeout)
+	ctx, cancel := context.WithTimeout(ctx, settings_utils.ServiceSettings.Metrics.RequestTimeout)
 	defer cancel()
 
 	var healthCheckable Health

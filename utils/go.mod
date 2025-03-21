@@ -1,4 +1,4 @@
-module github.com/teadove/teasutils
+module github.com/teadove/teasutils/utils
 
 go 1.23.0
 

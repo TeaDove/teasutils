@@ -23,8 +23,8 @@ func TestUnit_LoggerUtils_ErrorWithStackrace_Ok(t *testing.T) {
 func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(t *testing.T) {
 	t.Parallel()
 
-	settings_utils.BaseSettings.Log.Level = "DEBUG"
-	settings_utils.BaseSettings.Log.Factory = "JSON"
+	settings_utils.ServiceSettings.Log.Level = "DEBUG"
+	settings_utils.ServiceSettings.Log.Factory = "JSON"
 	logger := makeLogger()
 
 	err := errors.WithStack(errors.New("test error"))

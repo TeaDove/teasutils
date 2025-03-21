@@ -40,20 +40,20 @@ func loadSettings[T any](envPrefix string) (T, error) {
 //		   Token string `env:"TOKEN,required"`
 //		 }
 //
-//		 type baseSettings struct {
+//		 type serviceSettings struct {
 //			TG  tg  `env:"TG" envPrefix:"TG__"`
 //		 }
 //		 func init() {
 //			  ctx := logger_utils.NewLoggedCtx()
 //
-//			  Settings = must_utils.Must(settings_utils.InitSetting[baseSettings](
+//			  Settings = must_utils.Must(settings_utils.InitSetting[serviceSettings](
 //			  	  ctx,
 //	           "TEAS_",
 //			  	  "TG.Token",
 //			  ))
 //		 }
 //
-//		 var Settings baseSettings
+//		 var Settings serviceSettings
 //
 // Panics if dotEnv file found, but corrupted.
 func GetSettings[T any](ctx context.Context, envPrefix string) (*T, error) {

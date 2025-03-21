@@ -15,7 +15,7 @@ import (
 
 func runMetricsFromSettingsInBackground(ctx context.Context, container Container) {
 	go func() {
-		err := runMetrics(ctx, settings_utils.BaseSettings.Metrics.URL, container)
+		err := runMetrics(ctx, settings_utils.ServiceSettings.Metrics.URL, container)
 		if err != nil {
 			panic(fmt.Sprintf("failed to run metrics http api: %v", err))
 		}
@@ -31,7 +31,7 @@ func runMetrics(ctx context.Context, url string, container Container) error {
 
 		innerCtx, cancel := context.WithTimeout(
 			innerCtx,
-			settings_utils.BaseSettings.Metrics.RequestTimeout,
+			settings_utils.ServiceSettings.Metrics.RequestTimeout,
 		)
 		defer cancel()
 
