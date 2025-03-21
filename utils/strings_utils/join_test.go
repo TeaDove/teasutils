@@ -15,6 +15,8 @@ func (r *User) String() string {
 }
 
 func TestUnit_StringsUtils_JoinStringers_Ok(t *testing.T) {
+	t.Parallel()
+
 	users := []*User{{Name: "John"}, {Name: "Jane"}, {Name: "Artem"}}
 
 	assert.Equal(t, "John, Jane, Artem", JoinStringers(users, ", "))

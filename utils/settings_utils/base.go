@@ -78,7 +78,7 @@ func setStartedAt(settings *serviceSettings) {
 	}
 }
 
-// nolint: gochecknoinits // required here
+//nolint: gochecknoinits // required here
 func init() {
 	setServiceName(ServiceSettings)
 	setStartedAt(ServiceSettings)

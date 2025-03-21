@@ -6,7 +6,7 @@ import (
 )
 
 // JoinStringers
-// Works like strings.Join, but Stringer interface
+// Works like strings.Join, but Stringer interface.
 func JoinStringers[T fmt.Stringer](elems []T, sep string) string {
 	const maxInt = int(^uint(0) >> 1)
 
