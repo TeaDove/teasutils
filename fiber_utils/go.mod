@@ -1,4 +1,4 @@
-module github.com/teadove/teasutils/utils/fiber_utils
+module github.com/teadove/teasutils/fiber_utils
 
 go 1.23.0
 
