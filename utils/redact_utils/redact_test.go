@@ -1,9 +1,11 @@
 package redact_utils
 
 import (
+	"encoding/json"
 	"testing"
 
-	"github.com/teadove/teasutils/utils/json_utils"
+	"github.com/teadove/teasutils/utils/must_utils"
+
 	"github.com/teadove/teasutils/utils/test_utils"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +32,7 @@ func TestUnit_RedactUtils_Trim_Ok(t *testing.T) {
 
 	assert.Equal(t, "[]", Trim(""))
 	assert.Equal(t, "[123]", Trim("123"))
-	assert.Equal(t, "[12345...:14]", Trim("12345678901234"))
+	assert.Equal(t, "[1234567890...:14]", Trim("12345678901234"))
 }
 
 func TestUnit_RedactUtils_RedactJSONWithPrefix_Ok(t *testing.T) {
@@ -56,7 +58,7 @@ func TestUnit_RedactUtils_RedactJSONWithPrefix_Ok(t *testing.T) {
 		`{"db":{"host":"localhost","password":"[REDACTED:12345...:9]","port":"5432"},
 "user":{"name":"TeaDove","password":"[REDACTED:12345...:9]","phone":"[REDACTED:12345...:9]"}}`,
 		string(RedactJSONWithPrefix(ctx,
-			json_utils.MarshalOrWarn(ctx, values),
+			must_utils.Must(json.Marshal(values)),
 			"user.password", "user.phone", "db.password", "undefined",
 		)),
 	)

@@ -2,6 +2,7 @@ package settings_utils
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"syscall"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/utils/json_utils"
 	"github.com/teadove/teasutils/utils/must_utils"
 	"github.com/teadove/teasutils/utils/redact_utils"
 )
@@ -64,9 +64,14 @@ func GetSettings[T any](ctx context.Context, envPrefix string) (*T, error) {
 		return nil, errors.Wrap(err, "failed to load settings")
 	}
 
+	marshaledSettings, err := json.Marshal(settings)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal settings")
+	}
+
 	prelog := zerolog.Ctx(ctx).
 		Debug().
-		RawJSON("v", redact_utils.RedactLongStrings(json_utils.MarshalOrWarn(ctx, settings)))
+		RawJSON("v", redact_utils.RedactLongStrings(marshaledSettings))
 
 	if getEnvFileRefreshEnabled() {
 		go refresh(ctx, &settings, lastLoad, envPrefix)

@@ -39,12 +39,6 @@ func ErrHandler() func(c *fiber.Ctx, err error) error {
 	}
 }
 
-func RequestIDMiddleware() func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		c.Get(logger_utils.MakeIfEmpty())
-	}
-}
-
 type contextAppender func(c *fiber.Ctx, ctx context.Context) context.Context
 
 type LogCtxConfig struct {
@@ -92,17 +86,17 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 			statusCode := c.Response().StatusCode()
 			switch {
 			case statusCode < 400:
-				zerolog.Ctx(ctx).
+				zerolog.Ctx(c.UserContext()).
 					Info().
 					Int("code", statusCode). // TODO add resp-size and duration
 					Msg("request.processed")
 			case statusCode < 500:
-				zerolog.Ctx(ctx).
+				zerolog.Ctx(c.UserContext()).
 					Warn().
 					Int("code", statusCode). // TODO add resp-size and duration
 					Msg("request.processed")
 			default:
-				zerolog.Ctx(ctx).
+				zerolog.Ctx(c.UserContext()).
 					Error().
 					Int("code", statusCode). // TODO add resp-size and duration
 					Msg("request.processed")
