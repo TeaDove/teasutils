@@ -3,11 +3,12 @@ package fiber_utils
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/utils/logger_utils"
-	"net/http"
 )
 
 func ErrHandler() func(c *fiber.Ctx, err error) error {

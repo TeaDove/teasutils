@@ -2,8 +2,9 @@ package logger_utils
 
 import (
 	"context"
-	"github.com/teadove/teasutils/utils/random_utils"
 	"strings"
+
+	"github.com/teadove/teasutils/utils/random_utils"
 
 	"github.com/teadove/teasutils/utils/settings_utils"
 )
@@ -15,14 +16,13 @@ const (
 	maxLen    = 50
 )
 
-var (
-	suffix = makeSuffix() //nolint: gochecknoglobals // Required
-)
+var suffix = makeSuffix() //nolint: gochecknoglobals // Required
 
 func makeSuffix() string {
 	var builder strings.Builder
 
 	builder.WriteByte('-')
+
 	for _, part := range strings.Split(settings_utils.ServiceSettings.ServiceName, "-") {
 		if part == "" {
 			continue
@@ -46,6 +46,7 @@ func MakeIfEmpty(ctx context.Context, id string) (context.Context, string) {
 	if len(id) < maxLen {
 		id += suffix
 	}
+
 	return set(ctx, id), id
 }
 

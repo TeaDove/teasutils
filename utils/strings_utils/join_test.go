@@ -1,8 +1,9 @@
 package strings_utils
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type User struct {

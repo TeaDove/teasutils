@@ -11,7 +11,9 @@ test:
 lint:
 	gofumpt -w .
 	golines --base-formatter=gofumpt --max-len=120 --no-reformat-tags -w .
-	wsl --fix ./... || wsl --fix ./...
-	golangci-lint run --fix
+	cd utils && wsl --fix ./...
+	cd fiber_utils && wsl --fix ./...
+	cd utils && golangci-lint run --fix
+	cd fiber_utils && golangci-lint run --fix
 
 test_and_lint: test lint
