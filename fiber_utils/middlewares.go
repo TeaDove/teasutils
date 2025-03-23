@@ -51,7 +51,7 @@ type LogCtxConfig struct {
 	DisableUserAgent  bool
 }
 
-var logCtx struct{}
+var logCtxKey = "logCtx"
 
 func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
 	contexts := make([]contextAppender, 0)
@@ -84,7 +84,7 @@ func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
 		}
 
 		c.SetUserContext(ctx)
-		c.Locals(logCtx, ctx)
+		c.Locals(logCtxKey, ctx)
 
 		err := c.Next()
 		if err == nil && !config.DisableLogRequest {
@@ -113,6 +113,8 @@ func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
 	}
 }
 
-func GetLogCtx(c *fiber.Ctx) context.Context {
-	return c.Locals(logCtx).(context.Context)
+func GetLogCtx(c interface {
+	Locals(key string, value ...any) any
+}) context.Context {
+	return c.Locals(logCtxKey).(context.Context)
 }
