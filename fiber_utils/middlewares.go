@@ -51,7 +51,9 @@ type LogCtxConfig struct {
 	DisableUserAgent  bool
 }
 
-func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
+var logCtx struct{}
+
+func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
 	contexts := make([]contextAppender, 0)
 	if !config.DisableIP {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
@@ -61,13 +63,10 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 
 	if !config.DisableAPPMethod {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
-			return logger_utils.WithValue(ctx,
+			return logger_utils.WithValue(
+				ctx,
 				"app_method",
-				fmt.Sprintf(
-					"%s %s",
-					c.Method(),
-					c.Path(),
-				),
+				fmt.Sprintf("%s %s", c.Method(), c.Path()),
 			)
 		})
 	}
@@ -85,6 +84,7 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 		}
 
 		c.SetUserContext(ctx)
+		c.Locals(logCtx, ctx)
 
 		err := c.Next()
 		if err == nil && !config.DisableLogRequest {
@@ -111,4 +111,8 @@ func LogCtxMiddleware(config *LogCtxConfig) func(c *fiber.Ctx) error {
 
 		return err //nolint: wrapcheck // fp
 	}
+}
+
+func GetLogCtx(c *fiber.Ctx) context.Context {
+	return c.Locals(logCtx).(context.Context)
 }
