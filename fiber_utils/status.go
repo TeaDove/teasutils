@@ -11,6 +11,7 @@ func StatusFromContext(c *fiber.Ctx, err error) int {
 	}
 
 	var e *fiber.Error
+
 	code := fiber.StatusInternalServerError
 	if errors.As(err, &e) {
 		code = e.Code
