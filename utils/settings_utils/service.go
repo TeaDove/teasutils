@@ -45,7 +45,7 @@ func (r *serviceSettings) Uptime() time.Duration {
 }
 
 //nolint:gochecknoglobals // need this
-var ServiceSettings = MustGetSetting[serviceSettings](context.Background(), "BASE_")
+var ServiceSettings = MustGetSetting[serviceSettings](context.Background(), "SERVICE_")
 
 // TODO add hooks
 func setServiceName(settings *serviceSettings) {

@@ -45,15 +45,14 @@ func ErrHandler() func(c *fiber.Ctx, err error) error {
 type contextAppender func(c *fiber.Ctx, ctx context.Context) context.Context
 
 type LogCtxConfig struct {
-	DisableLogRequest bool
-	DisableIP         bool
-	DisableAPPMethod  bool
-	DisableUserAgent  bool
+	DisableIP        bool
+	DisableAPPMethod bool
+	DisableUserAgent bool
 }
 
-var logCtxKey = "logCtx"
+const logCtxKey = "logCtx"
 
-func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
+func MiddlewareLogger(config LogCtxConfig) func(c *fiber.Ctx) error {
 	contexts := make([]contextAppender, 0)
 	if !config.DisableIP {
 		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
@@ -87,7 +86,7 @@ func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
 		c.Locals(logCtxKey, ctx)
 
 		err := c.Next()
-		if err == nil && !config.DisableLogRequest {
+		if err == nil {
 			statusCode := c.Response().StatusCode()
 
 			switch {
@@ -115,6 +114,7 @@ func MiddlewareLogger(config *LogCtxConfig) func(c *fiber.Ctx) error {
 
 func GetLogCtx(c interface {
 	Locals(key string, value ...any) any
-}) context.Context {
-	return c.Locals(logCtxKey).(context.Context)
+},
+) context.Context {
+	return c.Locals(logCtxKey).(context.Context) //nolint: errcheck // expected to never fail
 }
