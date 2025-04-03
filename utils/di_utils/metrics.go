@@ -13,16 +13,16 @@ import (
 	"github.com/teadove/teasutils/utils/settings_utils"
 )
 
-func runMetricsFromSettingsInBackground(ctx context.Context, container Container) {
+func runMetricsFromSettingsInBackground(ctx context.Context, healthers []any) {
 	go func() {
-		err := runMetrics(ctx, settings_utils.ServiceSettings.Metrics.URL, container)
+		err := runMetrics(ctx, settings_utils.ServiceSettings.Metrics.URL, healthers)
 		if err != nil {
 			panic(fmt.Sprintf("failed to run metrics http api: %v", err))
 		}
 	}()
 }
 
-func runMetrics(ctx context.Context, url string, container Container) error {
+func runMetrics(ctx context.Context, url string, healthers []any) error {
 	promHandler := promhttp.Handler()
 
 	server := http.NewServeMux()
@@ -40,7 +40,7 @@ func runMetrics(ctx context.Context, url string, container Container) error {
 	server.HandleFunc("/health", func(writer http.ResponseWriter, request *http.Request) {
 		innerCtx := logger_utils.AddLoggerToCtx(request.Context())
 
-		errFromChecker := checkFromCheckers(innerCtx, container.Healths())
+		errFromChecker := checkFromCheckers(innerCtx, healthers)
 		if errFromChecker == nil {
 			writer.WriteHeader(http.StatusOK)
 

@@ -1,6 +1,7 @@
-package refrect_utils
+package reflect_utils
 
 import (
+	"fmt"
 	"reflect"
 	"runtime"
 )
@@ -19,5 +20,5 @@ func GetTypesStringRepresentation(v any) string {
 }
 
 func GetFunctionName(i any) string {
-	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+	return fmt.Sprintf("%s %T", runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name(), i)
 }

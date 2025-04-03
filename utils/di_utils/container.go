@@ -6,6 +6,8 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/teadove/teasutils/utils/reflect_utils"
+
 	"github.com/teadove/teasutils/utils/context_utils"
 
 	"golang.org/x/sync/errgroup"
@@ -16,21 +18,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/utils/refrect_utils"
 )
-
-type CloserWithContext interface {
-	Close(ctx context.Context) error
-}
-
-type Health interface {
-	Health(ctx context.Context) error
-}
-
-type Container interface {
-	Healths() []Health
-	Closers() []CloserWithContext
-}
 
 func withProfiler(ctx context.Context) error {
 	file, err := os.Create(settings_utils.ServiceSettings.Prof.ResultFilename)
@@ -48,15 +36,23 @@ func withProfiler(ctx context.Context) error {
 	return nil
 }
 
-func stop(ctx context.Context, container Container) error {
+func stop(ctx context.Context, stoppers []any) error {
 	errorsGroup, ctx := errgroup.WithContext(ctx)
 
 	ctx, cancel := context.WithTimeout(ctx, settings_utils.ServiceSettings.Metrics.CloseTimeout)
 	defer cancel()
 
-	for _, stoper := range container.Closers() {
+	for _, stopper := range stoppers {
+		v := reflect_utils.ConvertToWithCtxAndErr(stopper)
+		if v == nil {
+			zerolog.Ctx(ctx).
+				Error().
+				Str("stopper", reflect_utils.GetFunctionName(v)).
+				Msg("stopper.is.null")
+		}
+
 		errorsGroup.Go(func() error {
-			return context_utils.CPUCancel(ctx, stoper.Close)
+			return context_utils.CPUCancel(ctx, v)
 		})
 	}
 
@@ -68,9 +64,9 @@ func stop(ctx context.Context, container Container) error {
 	return nil
 }
 
-func BuildFromSettings[T Container](
+func BuildFromSettings[T any](
 	ctx context.Context,
-	builder func(ctx context.Context) (T, error),
+	builder func(ctx context.Context) (T, []any, []any, error),
 ) (T, error) {
 	if settings_utils.ServiceSettings.Prof.SpamMemUsage {
 		go perf_utils.SpamLogMemUsage(ctx, settings_utils.ServiceSettings.Prof.SpamMemUsagePeriod)
@@ -89,19 +85,19 @@ func BuildFromSettings[T Container](
 
 	t0 := time.Now()
 
-	builtContainer, err := builder(ctx)
+	builtContainer, healthers, stoppers, err := builder(ctx)
 	if err != nil {
 		return *new(T), errors.Wrap(err, "build container failed")
 	}
 
 	if !settings_utils.ServiceSettings.Release {
-		err = checkFromCheckers(ctx, builtContainer.Healths())
+		err = checkFromCheckers(ctx, healthers)
 		if err != nil {
 			return *new(T), errors.Wrap(err, "health check failed")
 		}
 	}
 
-	runMetricsFromSettingsInBackground(ctx, builtContainer)
+	runMetricsFromSettingsInBackground(ctx, healthers)
 	notify_utils.RunOnInterruptAndExit(func() {
 		t0 = time.Now()
 
@@ -113,7 +109,7 @@ func BuildFromSettings[T Container](
 			pprof.StopCPUProfile()
 		}
 
-		err = stop(ctx, builtContainer)
+		err = stop(ctx, stoppers)
 		if err != nil {
 			zerolog.Ctx(ctx).
 				Error().
@@ -130,16 +126,16 @@ func BuildFromSettings[T Container](
 
 	zerolog.Ctx(ctx).
 		Info().
-		Str("container", refrect_utils.GetTypesStringRepresentation(builtContainer)).
+		Str("container", reflect_utils.GetTypesStringRepresentation(builtContainer)).
 		Str("elapsed", time.Since(t0).String()).
 		Msg("container.built")
 
 	return builtContainer, nil
 }
 
-func MustBuildFromSettings[T Container](
+func MustBuildFromSettings[T any](
 	ctx context.Context,
-	builder func(ctx context.Context) (T, error),
+	builder func(ctx context.Context) (T, []any, []any, error),
 ) T {
 	t, err := BuildFromSettings[T](ctx, builder)
 	if err != nil {

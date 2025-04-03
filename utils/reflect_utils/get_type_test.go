@@ -1,4 +1,4 @@
-package refrect_utils
+package reflect_utils
 
 import (
 	"testing"
@@ -25,7 +25,7 @@ func TestUnit_ReflectUtils_GetFunctionName_Ok(t *testing.T) {
 
 	assert.Equal(
 		t,
-		"github.com/teadove/teasutils/utils/refrect_utils.TestUnit_ReflectUtils_GetFunctionName_Ok",
+		"github.com/teadove/teasutils/utils/reflect_utils.TestUnit_ReflectUtils_GetFunctionName_Ok func(*testing.T)",
 		GetFunctionName(TestUnit_ReflectUtils_GetFunctionName_Ok),
 	)
 }

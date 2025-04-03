@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/teadove/teasutils/utils/refrect_utils"
+	"github.com/teadove/teasutils/utils/reflect_utils"
 
 	"github.com/rs/zerolog"
 )
@@ -29,7 +29,7 @@ func LogAny(values ...any) {
 	for _, value := range values {
 		arr.Dict(
 			zerolog.Dict().
-				Interface(refrect_utils.GetTypesStringRepresentation(value), value),
+				Interface(reflect_utils.GetTypesStringRepresentation(value), value),
 		)
 	}
 

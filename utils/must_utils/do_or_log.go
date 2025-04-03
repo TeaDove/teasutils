@@ -3,7 +3,7 @@ package must_utils
 import (
 	"context"
 
-	"github.com/teadove/teasutils/utils/refrect_utils"
+	"github.com/teadove/teasutils/utils/reflect_utils"
 
 	"github.com/rs/zerolog"
 )
@@ -18,7 +18,7 @@ func DoOrLog(
 			zerolog.Ctx(ctx).
 				Error().
 				Err(err).
-				Str("func_name", refrect_utils.GetFunctionName(f)).
+				Str("func_name", reflect_utils.GetFunctionName(f)).
 				Msg(errorMsg)
 		}
 	}
@@ -35,7 +35,7 @@ func DoOrLogWithStacktrace(
 				Error().
 				Stack().
 				Err(err).
-				Str("func_name", refrect_utils.GetFunctionName(f)).
+				Str("func_name", reflect_utils.GetFunctionName(f)).
 				Msg(errorMsg)
 		}
 	}
