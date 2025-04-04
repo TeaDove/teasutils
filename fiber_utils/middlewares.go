@@ -1,10 +1,10 @@
 package fiber_utils
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/teadove/teasutils/utils/logger_utils"
 )
 
-func ErrHandler() func(c *fiber.Ctx, err error) error {
+func ErrHandler() fiber.ErrorHandler {
 	return func(c *fiber.Ctx, err error) error {
 		code := fiber.StatusInternalServerError
 
@@ -42,79 +42,26 @@ func ErrHandler() func(c *fiber.Ctx, err error) error {
 	}
 }
 
-type contextAppender func(c *fiber.Ctx, ctx context.Context) context.Context
-
-type LogCtxConfig struct {
-	DisableIP        bool
-	DisableAPPMethod bool
-	DisableUserAgent bool
-}
-
-const logCtxKey = "logCtx"
-
-func MiddlewareLogger(config LogCtxConfig) func(c *fiber.Ctx) error {
-	contexts := make([]contextAppender, 0)
-	if !config.DisableIP {
-		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
-			return logger_utils.WithValue(ctx, "ip", c.IP())
-		})
-	}
-
-	if !config.DisableAPPMethod {
-		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
-			return logger_utils.WithValue(
-				ctx,
-				"app_method",
-				fmt.Sprintf("%s %s", c.Method(), c.Path()),
-			)
-		})
-	}
-
-	if !config.DisableUserAgent {
-		contexts = append(contexts, func(c *fiber.Ctx, ctx context.Context) context.Context {
-			return logger_utils.WithValue(ctx, "user_agent", strings.Clone(c.Get("User-Agent")))
-		})
-	}
-
+func MiddlewareLogger() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		t0 := time.Now()
 		ctx := logger_utils.AddLoggerToCtx(c.UserContext())
-		for _, appender := range contexts {
-			ctx = appender(c, ctx) //nolint: fatcontext // fp
-		}
+		ctx = logger_utils.WithValue(ctx, "ip", c.IP())
+		ctx = logger_utils.WithValue(ctx, "app_method", fmt.Sprintf("%s %s", c.Method(), c.Path()))
+		ctx = logger_utils.WithValue(ctx, "user_agent", strings.Clone(c.Get(fiber.HeaderUserAgent)))
 
 		c.SetUserContext(ctx)
-		c.Locals(logCtxKey, ctx)
 
 		err := c.Next()
-		if err == nil {
-			statusCode := c.Response().StatusCode()
 
-			switch {
-			case statusCode < http.StatusBadRequest:
-				zerolog.Ctx(c.UserContext()).
-					Info().
-					Int("code", statusCode). // TODO add resp-size and duration
-					Msg("request.processed")
-			case statusCode < http.StatusInternalServerError:
-				zerolog.Ctx(c.UserContext()).
-					Warn().
-					Int("code", statusCode). // TODO add resp-size and duration
-					Msg("request.processed")
-			default:
-				zerolog.Ctx(c.UserContext()).
-					Error().
-					Int("code", statusCode). // TODO add resp-size and duration
-					Msg("request.processed")
-			}
-		}
+		zerolog.Ctx(c.UserContext()).
+			Info().
+			Int("req_len", c.Request().Header.ContentLength()).
+			Int("resp_len", c.Response().Header.ContentLength()).
+			Str("latency", time.Since(t0).String()).
+			Int("code", StatusFromContext(c, err)). // TODO add resp-size and duration
+			Msg("request.processed")
 
 		return err //nolint: wrapcheck // fp
 	}
-}
-
-func GetLogCtx(c interface {
-	Locals(key string, value ...any) any
-},
-) context.Context {
-	return c.Locals(logCtxKey).(context.Context) //nolint: errcheck // expected to never fail
 }
