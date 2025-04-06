@@ -2,9 +2,12 @@ package test_utils
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
+	"strings"
 
-	"github.com/teadove/teasutils/utils/reflect_utils"
+	"github.com/fatih/color"
 
 	"github.com/rs/zerolog"
 )
@@ -21,17 +24,24 @@ func GetLoggedContext() context.Context {
 	return logger.With().Logger().WithContext(context.Background())
 }
 
-// LogAny
+// Pprint
 //
-// Logs everything, only for debug purposes.
-func LogAny(values ...any) {
-	arr := zerolog.Arr()
+// Prints everything with types, only for debug purposes.
+func Pprint(values ...any) {
+	var v strings.Builder
 	for _, value := range values {
-		arr.Dict(
-			zerolog.Dict().
-				Interface(reflect_utils.GetTypesStringRepresentation(value), value),
-		)
+		v.WriteString(color.RedString(fmt.Sprintf("%T", value)))
+		v.WriteString(": ")
+
+		encoded, err := json.MarshalIndent(value, "", "  ")
+		if err != nil {
+			v.WriteString(fmt.Sprintf("%+v", value))
+			continue
+		}
+
+		v.Write(encoded)
+		v.WriteByte('\n')
 	}
 
-	zerolog.Ctx(GetLoggedContext()).Info().Array("items", arr).Msg("logging.any")
+	println(v.String()) //nolint: forbidigo // required
 }
