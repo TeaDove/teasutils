@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-//nolint: gochecknoglobals, mnd // required
+// nolint: gochecknoglobals, mnd // required
 var Refreshed = make(chan struct{}, 10)
 
 func refresh[T any](
@@ -39,7 +39,7 @@ func refresh[T any](
 			continue
 		}
 
-		if file.ModTime() == loadedAt {
+		if file.ModTime().Equal(loadedAt) {
 			continue
 		}
 

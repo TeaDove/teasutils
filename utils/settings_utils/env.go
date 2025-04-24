@@ -20,7 +20,7 @@ func loadSettings[T any](envPrefix string) (T, error) {
 	err := godotenv.Overload(getEnvFilePath())
 	if err != nil {
 		var pathErr *os.PathError
-		if !(errors.As(err, &pathErr) && errors.Is(pathErr.Err, syscall.ENOENT)) {
+		if !errors.As(err, &pathErr) || !errors.Is(pathErr.Err, syscall.ENOENT) {
 			return *new(T), errors.Wrap(err, "failed to load dotenv file")
 		}
 	}

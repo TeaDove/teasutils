@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	maxLen = 12
+	maxLen = 150
 )
 
 func redactRecursivly(iterableValue gjson.Result, prefix string, result []byte) []byte {

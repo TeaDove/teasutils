@@ -21,14 +21,13 @@ func TestUnit_RedactUtils_ReductLongStrings_Ok(t *testing.T) {
 		"db": map[string]any{
 			"host":     "localhost",
 			"port":     "5432",
-			"password": "1234567890123456789",
+			"password": "12345678901234567891234567890123456789123456789012345678912345678901234567891234567890123456789123456789012345678912345678901234567891234567890123456789123456789012345678912345678901234567891234567890123456789", //nolint: lll // Required
 		},
 	}
 
 	assert.JSONEq(
 		t,
-		`{"db":{"host":"localhost","password":"[REDACTED:123456789012...:19]","port":"5432"},
-"user":{"name":"TeaDove","password":"[REDACTED:123456789012...:19]","phone":123456789}}`,
+		`{"db":{"host":"localhost","password":"[REDACTED:123456789012345678912345678901234567891234567890123456789123456789012345678912345678901234567891234567890123456789123456789012345678912345678901234567...:209]","port":"5432"},"user":{"name":"TeaDove","password":"1234567890123456789","phone":123456789}}`, //nolint: lll // Required
 		string(RedactLongStrings(must_utils.Must(json.Marshal(values)))),
 	)
 }

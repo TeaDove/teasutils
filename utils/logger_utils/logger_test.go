@@ -59,8 +59,8 @@ func TestUnit_LoggerUtils_ReadWriteCtx_Ok(t *testing.T) {
 
 	ctx = WithReadableValue(ctx, "appId", "123")
 	act = ReadValue(ctx, "appIdWrong")
-	assert.Equal(t, "", act)
+	assert.Empty(t, act)
 
 	act = ReadValue(ctx, "somethingOther")
-	assert.Equal(t, "", act)
+	assert.Empty(t, act)
 }
