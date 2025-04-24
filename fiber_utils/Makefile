@@ -14,4 +14,4 @@ lint:
 	wsl --fix ./...
 	golangci-lint run --fix
 
-test_and_lint: test lint
+test-and-lint: test lint
