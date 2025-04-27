@@ -1,13 +1,12 @@
 # Teas Go Utils
+![изображение](https://github.com/user-attachments/assets/57016a1a-ad44-4ffb-b33a-22e659a96f63)
+
 This package contains some usefull utils for golang
 
-Some of them are package based:
-- for zerolog
-- for settings in .env/envs
-But most are just extensions for std lib
 
 # Install
 
 ```shell
-go get github.com/teadove/teasutils
+go get github.com/teadove/teasutils/utils
+go get github.com/teadove/teasutils/fiber-utils
 ``` 
