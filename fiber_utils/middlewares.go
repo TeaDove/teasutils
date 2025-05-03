@@ -54,13 +54,20 @@ func MiddlewareLogger() fiber.Handler {
 
 		err := c.Next()
 
-		zerolog.Ctx(c.UserContext()).
-			Info().
-			Int("req_len", c.Request().Header.ContentLength()).
-			Int("resp_len", c.Response().Header.ContentLength()).
+		log := zerolog.Ctx(c.UserContext()).
+			Debug().
 			Str("latency", time.Since(t0).String()).
-			Int("code", StatusFromContext(c, err)). // TODO add resp-size and duration
-			Msg("request.processed")
+			Int("code", StatusFromContext(c, err))
+
+		if c.Request().Header.ContentLength() > 0 {
+			log.Int("req_len", c.Request().Header.ContentLength())
+		}
+
+		if c.Response().Header.ContentLength() > 0 {
+			log.Int("resp_len", c.Response().Header.ContentLength())
+		}
+
+		log.Msg("request.processed")
 
 		return err //nolint: wrapcheck // fp
 	}
