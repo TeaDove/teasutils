@@ -1,12 +1,12 @@
 module github.com/teadove/teasutils/fiber_utils
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.33.0
-	github.com/teadove/teasutils/utils v0.0.0-20250321180832-b02b906239ae
+	github.com/rs/zerolog v1.34.0
+	github.com/teadove/teasutils/utils v0.2.6
 )
 
 require (
@@ -24,7 +24,6 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.59.0 // indirect
-	github.com/wI2L/jsondiff v0.6.1 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	github.com/valyala/fasthttp v1.62.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 )

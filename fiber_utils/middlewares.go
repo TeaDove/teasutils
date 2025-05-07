@@ -22,6 +22,10 @@ func ErrHandler() fiber.ErrorHandler {
 			code = e.Code
 		}
 
+		println("-----")
+		fmt.Printf("%+v\n", err)
+		println("-----")
+
 		if code >= http.StatusInternalServerError {
 			zerolog.Ctx(c.UserContext()).
 				Error().
