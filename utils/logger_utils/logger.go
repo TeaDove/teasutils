@@ -9,52 +9,17 @@ import (
 
 	"github.com/teadove/teasutils/utils/settings_utils"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
 func printedMarshalStack(err error) any {
-	err = errors.WithStack(err)
-
-	type stackTracer interface {
-		StackTrace() errors.StackTrace
-	}
-
-	e, ok := err.(stackTracer)
-	if !ok {
-		return nil
-	}
-
-	stack := e.StackTrace()
-
-	for _, frame := range stack {
-		//nolint: forbidigo // only exception
-		fmt.Printf("%+v\n", frame)
-	}
+	fmt.Printf("%+v\n", err)
 
 	return "up"
 }
 
-func jsonMarshalStack(err error) any {
-	err = errors.WithStack(err)
-
-	type stackTracer interface {
-		StackTrace() errors.StackTrace
-	}
-
-	e, ok := err.(stackTracer)
-	if !ok {
-		return nil
-	}
-
-	stack := e.StackTrace()
-	v := strings.Builder{}
-
-	for _, frame := range stack {
-		v.WriteString(fmt.Sprintf("%+v\n", frame))
-	}
-
-	return v.String()
+func marshalStack(err error) any {
+	return fmt.Sprintf("%+v", err)
 }
 
 func makeLogger() zerolog.Logger {
@@ -75,7 +40,7 @@ func makeLogger() zerolog.Logger {
 		zerolog.ErrorStackMarshaler = printedMarshalStack
 	} else {
 		//nolint: reassign // TODO find better solution
-		zerolog.ErrorStackMarshaler = jsonMarshalStack
+		zerolog.ErrorStackMarshaler = marshalStack
 	}
 
 	logger.Trace().Str("logLevel", level.String()).Msg("logger.initiated")
