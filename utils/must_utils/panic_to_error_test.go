@@ -14,7 +14,7 @@ func TestUnit_MustUtils_PanicToError(t *testing.T) {
 	defer func() {
 		err := AnyToErr(recover())
 		require.Error(t, err)
-		assert.Equal(t, "aaaa: paniced", err.Error())
+		assert.Equal(t, "aaaa: panicked", err.Error())
 	}()
 
 	panic("aaaa")

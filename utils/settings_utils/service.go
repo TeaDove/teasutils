@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"regexp"
-	"time"
 )
 
 type logSettings struct {
@@ -17,35 +16,21 @@ type logSettings struct {
 	Factory string `env:"FACTORY" envDefault:"CONSOLE"`
 }
 
-type profSettings struct {
-	Enabled            bool          `env:"ENABLED"               envDefault:"false"`
-	ResultFilename     string        `env:"RESULT_FILENAME"       envDefault:"cpu.prof"`
-	SpamMemUsage       bool          `env:"SPAM_MEM_USAGE"        envDefault:"false"`
-	SpamMemUsagePeriod time.Duration `env:"SPAM_MEM_USAGE_PERIOD" envDefault:"15s"`
-}
-
-type metricsSettings struct {
-	URL            string        `env:"URL"             envDefault:"0.0.0.0:8093"`
-	RequestTimeout time.Duration `env:"REQUEST_TIMEOUT" envDefault:"10s"`
-	CloseTimeout   time.Duration `env:"CLOSE_TIMEOUT"   envDefault:"10s"`
-}
-
 type serviceSettings struct {
-	Release     bool      `env:"RELEASE"      envDefault:"true"`
-	StartedAt   time.Time `env:"START_TIME"   envDefault:""`
-	ServiceName string    `env:"SERVICE_NAME" envDefault:""`
+	Release     bool   `env:"RELEASE"      envDefault:"true"`
+	ServiceName string `env:"SERVICE_NAME" envDefault:""`
 
-	Log     logSettings     `envPrefix:"LOG__"`
-	Prof    profSettings    `envPrefix:"PROF__"`
-	Metrics metricsSettings `envPrefix:"METRICS__"`
-}
-
-func (r *serviceSettings) Uptime() time.Duration {
-	return time.Since(r.StartedAt)
+	Log logSettings `envPrefix:"LOG__"`
 }
 
 //nolint:gochecknoglobals // need this
-var ServiceSettings = MustGetSetting[serviceSettings](context.Background(), "SERVICE_")
+var ServiceSettings serviceSettings
+
+// nolint: gochecknoinits // required here
+func init() {
+	ServiceSettings = MustGetSetting[serviceSettings](context.Background(), "SERVICE_")
+	setServiceName(&ServiceSettings)
+}
 
 // TODO add hooks
 func setServiceName(settings *serviceSettings) {
@@ -70,16 +55,4 @@ func setServiceName(settings *serviceSettings) {
 	}
 
 	settings.ServiceName = hostName
-}
-
-func setStartedAt(settings *serviceSettings) {
-	if settings.StartedAt.IsZero() {
-		settings.StartedAt = time.Now().UTC()
-	}
-}
-
-// nolint: gochecknoinits // required here
-func init() {
-	setServiceName(ServiceSettings)
-	setStartedAt(ServiceSettings)
 }

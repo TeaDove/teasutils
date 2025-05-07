@@ -26,5 +26,5 @@ func TestUnit_ContextUtils_CPUCancel_Ok(t *testing.T) {
 	})
 
 	require.Error(t, err)
-	assert.Equal(t, "paniced: context canceled", err.Error())
+	assert.Equal(t, "panicked: context canceled", err.Error())
 }

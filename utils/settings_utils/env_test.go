@@ -3,7 +3,6 @@ package settings_utils
 import (
 	"os"
 	"testing"
-	"time"
 
 	"github.com/teadove/teasutils/utils/test_utils"
 
@@ -68,33 +67,11 @@ func TestUnit_Settings_PanicFromCorruptedFile_Ok(t *testing.T) {
 	_ = os.Remove(getEnvFilePath())
 }
 
-// nolint: paralleltest // working with files
-func TestUnit_Settings_TimeSetted_Ok(t *testing.T) {
-	assert.NotEmpty(t, ServiceSettings.StartedAt)
-}
-
 func TestUnit_Settings_SetServiceName_Ok(t *testing.T) {
 	t.Setenv("HOSTNAME", "device-get-event-bf6ff5d47-qbs4f")
 
 	settings := MustGetSetting[serviceSettings](test_utils.GetLoggedContext(), "BASE_")
-	setServiceName(settings)
+	setServiceName(&settings)
 
 	assert.Equal(t, "device-get-event", settings.ServiceName)
-}
-
-// nolint: paralleltest // working with files
-func TestUnit_Settings_Refresh_Ok(t *testing.T) {
-	err := os.Setenv("ENV_REFRESH_INTERVAL_S", "1")
-	require.NoError(t, err)
-
-	writeToEnvFile(t, `BASE_RELEASE=false`)
-
-	settings := MustGetSetting[serviceSettings](test_utils.GetLoggedContext(), "BASE_")
-	assert.False(t, settings.Release)
-
-	writeToEnvFile(t, `BASE_RELEASE=true`)
-	time.Sleep(2 * time.Second)
-	assert.True(t, settings.Release)
-
-	_ = os.Remove(getEnvFilePath())
 }

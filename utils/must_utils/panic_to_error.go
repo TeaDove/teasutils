@@ -13,13 +13,13 @@ func AnyToErr(v any) error {
 
 	err, ok := v.(error)
 	if ok {
-		return errors.Wrap(err, "paniced")
+		return errors.Wrap(err, "panicked")
 	}
 
 	strErr, ok := v.(string)
 	if ok {
-		return errors.Wrap(errors.New("paniced"), strErr)
+		return errors.Wrap(errors.New("panicked"), strErr)
 	}
 
-	return fmt.Errorf("paniced: %v", v)
+	return fmt.Errorf("panicked: %v", v)
 }
