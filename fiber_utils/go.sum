@@ -44,6 +44,10 @@ github.com/teadove/teasutils/utils v0.2.5 h1:b6Yru5ffe8Ekdh3b/c9VrekeLXukSpwqwJ8
 github.com/teadove/teasutils/utils v0.2.5/go.mod h1:6V9FXMZrBTV4+LVfQVKPbvOIGGNNCI2YzGejiHPddJI=
 github.com/teadove/teasutils/utils v0.2.6 h1:mes+Qa0lazhFj6wDBvcLa5Ktc5R9ihukApOQpSf11pA=
 github.com/teadove/teasutils/utils v0.2.6/go.mod h1:yO2qli6FDkV2kWgHAuovtuZ8oiq8F+cIoZ1smSFgI4U=
+github.com/teadove/teasutils/utils v0.2.7 h1:PBBPEGI7n4qKIumDu3LVFijJXKC4g2vbQ9CfmGXIpGo=
+github.com/teadove/teasutils/utils v0.2.7/go.mod h1:yO2qli6FDkV2kWgHAuovtuZ8oiq8F+cIoZ1smSFgI4U=
+github.com/teadove/teasutils/utils v0.2.8 h1:bB5TMY9q/oRW8avXPKpoemLVSjKlGoM7bORLIhkgSXc=
+github.com/teadove/teasutils/utils v0.2.8/go.mod h1:yO2qli6FDkV2kWgHAuovtuZ8oiq8F+cIoZ1smSFgI4U=
 github.com/tidwall/gjson v1.14.2/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/gjson v1.18.0 h1:FIDeeyB800efLX89e5a8Y0BNH+LOngJyGrIWxG2FKQY=
 github.com/tidwall/gjson v1.18.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=

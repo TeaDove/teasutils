@@ -2,6 +2,7 @@ package fiber_utils
 
 import (
 	"fmt"
+	"github.com/teadove/teasutils/utils/errors_utils"
 	"net/http"
 	"strings"
 	"time"
@@ -22,14 +23,10 @@ func ErrHandler() fiber.ErrorHandler {
 			code = e.Code
 		}
 
-		println("-----")
-		fmt.Printf("%+v\n", err)
-		println("-----")
-
 		if code >= http.StatusInternalServerError {
 			zerolog.Ctx(c.UserContext()).
 				Error().
-				Stack().Err(err).
+				Stack().Err(errors_utils.WithStackIfRequired(err)).
 				Int("code", code).
 				Msg("http.internal.error")
 		} else {

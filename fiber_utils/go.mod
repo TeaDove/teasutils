@@ -6,7 +6,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.34.0
-	github.com/teadove/teasutils/utils v0.2.6
+	github.com/teadove/teasutils/utils v0.2.8
 )
 
 require (
