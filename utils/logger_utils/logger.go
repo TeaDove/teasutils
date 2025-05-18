@@ -13,7 +13,7 @@ import (
 )
 
 func printedMarshalStack(err error) any {
-	fmt.Printf("%+v\n", err)
+	fmt.Printf("%+v\n", err) //nolint: forbidigo // Allowed for logs
 
 	return "up"
 }
