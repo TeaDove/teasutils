@@ -14,6 +14,14 @@ func AddLoggerToCtx(ctx context.Context) context.Context {
 	return globalLogger.With().Logger().WithContext(ctx)
 }
 
+func NewLvlLoggedCtx(lvl zerolog.Level) context.Context {
+	return AddLvlLoggerToCtx(context.Background(), lvl)
+}
+
+func AddLvlLoggerToCtx(ctx context.Context, lvl zerolog.Level) context.Context {
+	return globalLogger.With().Logger().Level(lvl).WithContext(ctx)
+}
+
 func WithValue(ctx context.Context, key string, value string) context.Context {
 	return zerolog.Ctx(ctx).With().Str(key, value).Ctx(ctx).Logger().WithContext(ctx)
 }
