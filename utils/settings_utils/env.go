@@ -1,17 +1,13 @@
 package settings_utils
 
 import (
-	"context"
-	"encoding/json"
 	"os"
 	"syscall"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/utils/must_utils"
-	"github.com/teadove/teasutils/utils/redact_utils"
 )
 
 // GetSettings
@@ -26,35 +22,23 @@ import (
 //	 }
 //
 //	 func init() {
-//		  ctx := logger_utils.NewLoggedCtx()
-//
-//		  Settings = must_utils.Must(settings_utils.InitSetting[serviceSettings](ctx, "TEAS_"))
+//		  Settings = settings_utils.MustGetSetting[serviceSettings]("TEAS_")
 //	 }
 //
 //	 var Settings serviceSettings
 //
 // Returns error if dotEnv file found, but corrupted.
-func GetSettings[T any](ctx context.Context, envPrefix string) (T, error) {
+func GetSettings[T any](envPrefix string) (T, error) {
 	settings, err := loadSettings[T](envPrefix)
 	if err != nil {
 		return *new(T), errors.Wrap(err, "failed to load settings")
 	}
 
-	marshaledSettings, err := json.Marshal(settings)
-	if err != nil {
-		return *new(T), errors.Wrap(err, "failed to marshal settings")
-	}
-
-	zerolog.Ctx(ctx).
-		Debug().
-		RawJSON("v", redact_utils.RedactLongStrings(marshaledSettings)).
-		Msg("settings.loaded")
-
 	return settings, nil
 }
 
-func MustGetSetting[T any](ctx context.Context, envPrefix string) T {
-	return must_utils.Must(GetSettings[T](ctx, envPrefix))
+func MustGetSetting[T any](envPrefix string) T {
+	return must_utils.Must(GetSettings[T](envPrefix))
 }
 
 func loadSettings[T any](envPrefix string) (T, error) {

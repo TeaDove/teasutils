@@ -1,7 +1,6 @@
 package settings_utils
 
 import (
-	"context"
 	"os"
 	"regexp"
 )
@@ -28,11 +27,10 @@ var ServiceSettings serviceSettings
 
 // nolint: gochecknoinits // required here
 func init() {
-	ServiceSettings = MustGetSetting[serviceSettings](context.Background(), "SERVICE_")
+	ServiceSettings = MustGetSetting[serviceSettings]("SERVICE_")
 	setServiceName(&ServiceSettings)
 }
 
-// TODO add hooks
 func setServiceName(settings *serviceSettings) {
 	if settings.ServiceName != "" {
 		return
