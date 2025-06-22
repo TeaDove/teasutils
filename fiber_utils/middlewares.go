@@ -1,11 +1,13 @@
 package fiber_utils
 
 import (
+	"context"
 	"fmt"
-	"github.com/teadove/teasutils/utils/errors_utils"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/teadove/teasutils/utils/errors_utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
@@ -71,5 +73,15 @@ func MiddlewareLogger() fiber.Handler {
 		log.Msg("request.processed")
 
 		return err //nolint: wrapcheck // fp
+	}
+}
+
+func MiddlewareCtxTimeout(dur time.Duration) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx, cancel := context.WithTimeout(c.UserContext(), dur)
+		defer cancel()
+		c.SetUserContext(ctx)
+
+		return c.Next()
 	}
 }
