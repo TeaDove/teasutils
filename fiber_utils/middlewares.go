@@ -41,7 +41,7 @@ func ErrHandler() fiber.ErrorHandler {
 
 		c.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
 
-		return c.Status(code).SendString(err.Error())
+		return c.Status(code).JSON(fiber.Map{"error": err.Error()})
 	}
 }
 
