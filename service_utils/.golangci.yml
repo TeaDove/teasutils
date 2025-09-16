@@ -5,11 +5,9 @@ linters:
     - asasalint
     - asciicheck
     - bidichk
-    - bodyclose
     - copyloopvar
     - cyclop
     - decorder
-    - dupl
     - durationcheck
     - errcheck
     - errname
@@ -41,7 +39,6 @@ linters:
     - makezero
     - mirror
     - misspell
-    - mnd
     - musttag
     - nakedret
     - nestif
@@ -62,7 +59,6 @@ linters:
     - sloglint
     - sqlclosecheck
     - staticcheck
-    - tagalign
     - testableexamples
     - testifylint
     - testpackage
@@ -74,7 +70,7 @@ linters:
     - usestdlibvars
     - wastedassign
     - whitespace
-    - wsl
+    - wsl_v5
     - zerologlint
   settings:
     cyclop:
@@ -194,8 +190,6 @@ linters:
           - gocritic
         source: //noinspection
       - linters:
-          - bodyclose
-          - dupl
           - errcheck
           - funlen
           - goconst
