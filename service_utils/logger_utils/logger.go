@@ -2,12 +2,11 @@ package logger_utils
 
 import (
 	"fmt"
+	"github.com/teadove/teasutils/service_utils/settings_utils"
 	"os"
 	"strings"
 
 	"github.com/teadove/teasutils/utils/must_utils"
-
-	"github.com/teadove/teasutils/utils/settings_utils"
 
 	"github.com/rs/zerolog"
 )

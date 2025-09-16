@@ -14,6 +14,7 @@ func CPUCancel(ctx context.Context, f func(ctx context.Context) error) (err erro
 	}()
 
 	errChan := make(chan error, 1)
+
 	go func() {
 		errChan <- f(ctx)
 	}()

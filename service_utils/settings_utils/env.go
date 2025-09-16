@@ -29,7 +29,7 @@ import (
 //
 // Returns error if dotEnv file found, but corrupted.
 func GetSettings[T any](envPrefix string) (T, error) {
-	settings, err := loadSettings[T](envPrefix)
+	settings, err := loadSettingsWithDotenv[T](envPrefix)
 	if err != nil {
 		return *new(T), errors.Wrap(err, "failed to load settings")
 	}
@@ -41,19 +41,23 @@ func MustGetSetting[T any](envPrefix string) T {
 	return must_utils.Must(GetSettings[T](envPrefix))
 }
 
-func loadSettings[T any](envPrefix string) (T, error) {
-	// Dangerous place! Dotenv files will override any set ENV settings!
+func loadSettingsWithDotenv[T any](envPrefix string) (T, error) {
+	// ! Dangerous place! Dotenv files will override any set ENV settings!
 	err := godotenv.Overload(getEnvFilePath())
 	if err != nil {
 		var pathErr *os.PathError
 		if !errors.As(err, &pathErr) || !errors.Is(pathErr.Err, syscall.ENOENT) {
-			return *new(T), errors.Wrap(err, "failed to load dotenv file")
+			return *new(T), errors.Wrap(err, "load dotenv file")
 		}
 	}
 
+	return loadSettings[T](envPrefix)
+}
+
+func loadSettings[T any](envPrefix string) (T, error) {
 	settings, err := env.ParseAsWithOptions[T](env.Options{Prefix: envPrefix})
 	if err != nil {
-		return *new(T), errors.Wrap(err, "failed to env parse")
+		return *new(T), errors.Wrap(err, "env parse")
 	}
 
 	return settings, nil

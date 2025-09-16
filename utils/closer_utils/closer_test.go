@@ -5,9 +5,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/teadove/teasutils/utils/test_utils"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/teadove/teasutils/utils/logger_utils"
 )
 
 type Closable struct {
@@ -32,7 +33,7 @@ func (c *Closable) Close() error {
 func TestUnit_CloserUtils_CloseOrLog_Ok(t *testing.T) {
 	t.Parallel()
 
-	ctx := logger_utils.NewLoggedCtx()
+	ctx := test_utils.GetLoggedContext()
 
 	closable := Closable{}
 	CloseOrLog(ctx, &closable)
@@ -43,7 +44,7 @@ func TestUnit_CloserUtils_CloseOrLog_Ok(t *testing.T) {
 func TestUnit_CloserUtils_CloseOrLog_DontPanic(t *testing.T) {
 	t.Parallel()
 
-	ctx := logger_utils.NewLoggedCtx()
+	ctx := test_utils.GetLoggedContext()
 
 	closable := Closable{}
 	closable.errOnClose = true
@@ -55,7 +56,7 @@ func TestUnit_CloserUtils_CloseOrLog_DontPanic(t *testing.T) {
 func TestUnit_CloserUtils_CloseOrLogOnCtxDone_CancelOk(t *testing.T) {
 	t.Parallel()
 
-	ctx := logger_utils.NewLoggedCtx()
+	ctx := test_utils.GetLoggedContext()
 	ctx, cancel := context.WithCancel(ctx)
 
 	var wg sync.WaitGroup
@@ -66,6 +67,7 @@ func TestUnit_CloserUtils_CloseOrLogOnCtxDone_CancelOk(t *testing.T) {
 
 	go func() {
 		defer wg.Done()
+
 		CloseOrLogOnCtxDone(ctx, &closable)
 	}()
 

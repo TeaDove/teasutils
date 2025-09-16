@@ -5,16 +5,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/teadove/teasutils/utils/test_utils"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/teadove/teasutils/utils/logger_utils"
 )
 
 func TestUnit_ContextUtils_CPUCancel_Ok(t *testing.T) {
 	t.Parallel()
 
-	ctx := logger_utils.NewLoggedCtx()
+	ctx := test_utils.GetLoggedContext()
 	ctx, cancel := context.WithCancel(ctx)
 
 	cancel()

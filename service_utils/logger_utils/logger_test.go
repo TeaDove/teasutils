@@ -1,9 +1,8 @@
 package logger_utils
 
 import (
+	"github.com/teadove/teasutils/service_utils/settings_utils"
 	"testing"
-
-	"github.com/teadove/teasutils/utils/settings_utils"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"

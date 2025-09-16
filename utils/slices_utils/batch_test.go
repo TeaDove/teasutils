@@ -37,6 +37,7 @@ func TestUnit_SlicesUtils_CutInBatchesEmptySlice_Ok(t *testing.T) {
 	t.Parallel()
 
 	var slice []int
+
 	batched := CutInBatches(slice, 10)
 
 	assert.Equal(t, [][]int{}, batched)
