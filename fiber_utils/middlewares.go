@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/utils/logger_utils"
+	"github.com/teadove/teasutils/service_utils/logger_utils"
 )
 
 func ErrHandler() fiber.ErrorHandler {
@@ -80,6 +80,7 @@ func MiddlewareCtxTimeout(dur time.Duration) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx, cancel := context.WithTimeout(c.UserContext(), dur)
 		defer cancel()
+
 		c.SetUserContext(ctx)
 
 		return c.Next()
