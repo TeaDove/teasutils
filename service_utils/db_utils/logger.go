@@ -11,20 +11,20 @@ import (
 type ZerologAdapter struct {
 }
 
-func (z ZerologAdapter) LogMode(level logger.LogLevel) logger.Interface {
+func (z ZerologAdapter) LogMode(_ logger.LogLevel) logger.Interface {
 	panic("no implemented")
 }
 
 func (z ZerologAdapter) Info(ctx context.Context, s string, i ...interface{}) {
-	zerolog.Ctx(ctx).Info().Msgf(s, i)
+	zerolog.Ctx(ctx).Info().Msgf(s, i...)
 }
 
 func (z ZerologAdapter) Warn(ctx context.Context, s string, i ...interface{}) {
-	zerolog.Ctx(ctx).Warn().Msgf(s, i)
+	zerolog.Ctx(ctx).Warn().Msgf(s, i...)
 }
 
 func (z ZerologAdapter) Error(ctx context.Context, s string, i ...interface{}) {
-	zerolog.Ctx(ctx).Error().Msgf(s, i)
+	zerolog.Ctx(ctx).Error().Msgf(s, i...)
 }
 
 func (z ZerologAdapter) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
