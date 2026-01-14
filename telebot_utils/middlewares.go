@@ -34,7 +34,7 @@ func ReportOnErr(err error, c tele.Context) {
 			Err(err).
 			Msg("failed.to.process.tg.update")
 
-		innerErr := c.Reply(err.Error())
+		innerErr := c.Reply(err.Error(), tele.ModeDefault)
 		if innerErr != nil {
 			zerolog.Ctx(GetOrSetCtx(c)).
 				Error().
