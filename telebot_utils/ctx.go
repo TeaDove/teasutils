@@ -3,6 +3,7 @@ package telebot_utils
 import (
 	"context"
 
+	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/service_utils/logger_utils"
 	"github.com/teadove/teasutils/utils/redact_utils"
 	tele "gopkg.in/telebot.v4"
@@ -32,4 +33,8 @@ func GetOrSetCtx(c tele.Context) context.Context {
 	c.Set("ctx", ctx)
 
 	return ctx
+}
+
+func Log(c tele.Context) *zerolog.Logger {
+	return zerolog.Ctx(GetOrSetCtx(c))
 }
