@@ -57,3 +57,17 @@ type Error struct {
 func (e Error) Error() string {
 	return fmt.Sprintf("code=%d, err=%v", e.code, e.err)
 }
+
+func NewClientError(err error) Error {
+	return Error{
+		code: http.StatusBadRequest,
+		err:  err,
+	}
+}
+
+func NewServerError(err error) Error {
+	return Error{
+		code: http.StatusInternalServerError,
+		err:  err,
+	}
+}
