@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const base32alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func Text() string {
 	const stringLen = 16
@@ -20,7 +20,7 @@ func TextWithLen(length int) string {
 	var builder strings.Builder
 	for range length {
 		//nolint: gosec // no need to be secure
-		builder.WriteByte(base32alphabet[rand.IntN(len(base32alphabet))])
+		builder.WriteByte(alphabet[rand.IntN(len(alphabet))])
 	}
 
 	return builder.String()

@@ -1,4 +1,3 @@
-GO ?= GO111MODULE=on CGO_ENABLED=0 go
 VERSION ?= $(shell cat VERSION)
 
 tag:
@@ -6,7 +5,7 @@ tag:
 	git push origin --tags
 
 test:
-	$(GO) test ./...
+	gotestsum --format-hide-empty-pkg -- ./... --race
 
 lint:
 	gofumpt -w .
