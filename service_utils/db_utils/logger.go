@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type ZerologAdapter struct {
-}
+type ZerologAdapter struct{}
 
 func (z ZerologAdapter) LogMode(_ logger.LogLevel) logger.Interface {
 	panic("no implemented")
@@ -27,7 +26,12 @@ func (z ZerologAdapter) Error(ctx context.Context, s string, i ...interface{}) {
 	zerolog.Ctx(ctx).Error().Msgf(s, i...)
 }
 
-func (z ZerologAdapter) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
+func (z ZerologAdapter) Trace(
+	ctx context.Context,
+	begin time.Time,
+	fc func() (sql string, rowsAffected int64),
+	err error,
+) {
 	sql, rowAffected := fc()
 
 	zerolog.Ctx(ctx).Trace().

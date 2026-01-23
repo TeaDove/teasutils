@@ -5,8 +5,8 @@ import (
 	"syscall"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/cockroachdb/errors"
 	"github.com/joho/godotenv"
-	"github.com/pkg/errors"
 	"github.com/teadove/teasutils/utils/must_utils"
 )
 
