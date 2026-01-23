@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/teadove/teasutils/fiber_utils"

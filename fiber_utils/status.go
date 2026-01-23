@@ -1,8 +1,8 @@
 package fiber_utils
 
 import (
+	"github.com/cockroachdb/errors"
 	"github.com/gofiber/fiber/v2"
-	"github.com/pkg/errors"
 )
 
 func StatusFromContext(c *fiber.Ctx, err error) int {

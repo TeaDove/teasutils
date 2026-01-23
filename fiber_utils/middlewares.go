@@ -9,8 +9,8 @@ import (
 
 	"github.com/teadove/teasutils/utils/errors_utils"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gofiber/fiber/v2"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/service_utils/logger_utils"
 )
