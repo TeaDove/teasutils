@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 	"github.com/rs/zerolog"
 	tele "gopkg.in/telebot.v4"
 )
