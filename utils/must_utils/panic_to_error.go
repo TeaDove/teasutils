@@ -3,7 +3,7 @@ package must_utils
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 )
 
 func AnyToErr(v any) error {

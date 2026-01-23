@@ -7,7 +7,7 @@ import (
 
 	"github.com/teadove/teasutils/utils/test_utils"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 	"github.com/stretchr/testify/assert"
 )
 

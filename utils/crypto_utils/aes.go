@@ -6,7 +6,7 @@ import (
 	"crypto/rand"
 	"io"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 )
 
 func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {

@@ -3,7 +3,7 @@ package must_utils
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 )
 
 func Must[T any](obj T, err error) T {
