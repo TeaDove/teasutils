@@ -5,12 +5,31 @@ import (
 	"time"
 )
 
+// RoundDuration
+// Returns pretty rounded duration string, i.e. 1h, 2d3h etc.
 func RoundDuration(d time.Duration) string {
 	const (
+		thousand        = 1000
 		secondsInMinute = 60.0
 		minutesInHour   = 60.0
 		hoursInDay      = 24.0
 	)
+
+	if d.Microseconds() < thousand {
+		if int(d.Nanoseconds())%thousand == 0 {
+			return fmt.Sprintf("%dms", int(d.Microseconds()))
+		}
+
+		return fmt.Sprintf("%d.%03dµ", int(d.Microseconds()), int(d.Nanoseconds())%thousand)
+	}
+
+	if d.Milliseconds() < thousand {
+		if int(d.Microseconds())%thousand == 0 {
+			return fmt.Sprintf("%dms", int(d.Milliseconds()))
+		}
+
+		return fmt.Sprintf("%d.%03dms", int(d.Milliseconds()), int(d.Microseconds())%thousand)
+	}
 
 	if d.Seconds() < secondsInMinute {
 		return d.String()

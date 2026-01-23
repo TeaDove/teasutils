@@ -63,6 +63,16 @@ func TestRoundDuration(t *testing.T) {
 			duration: 3*24*time.Hour + 18*time.Hour + 10*time.Minute + 20*time.Second,
 			want:     "3d18h",
 		},
+		{
+			name:     "ms",
+			duration: 512*time.Millisecond + 512*time.Microsecond + 512*time.Nanosecond,
+			want:     "512.512ms",
+		},
+		{
+			name:     "µ",
+			duration: 512*time.Microsecond + 51*time.Nanosecond,
+			want:     "512.051µ",
+		},
 	}
 
 	for _, tt := range tests {
