@@ -3,8 +3,6 @@ package logger_utils
 import (
 	"testing"
 
-	"github.com/teadove/teasutils/service_utils/settings_utils"
-
 	"github.com/cockroachdb/errors"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -19,9 +17,7 @@ func TestUnit_LoggerUtils_ErrorWithStackrace_Ok(_ *testing.T) { //nolint: parall
 }
 
 func TestUnit_LoggerUtils_ErrorWithStackraceInJson_Ok(_ *testing.T) { //nolint: paralleltest // racing
-	settings_utils.ServiceSettings.Log.Level = "DEBUG"
-	settings_utils.ServiceSettings.Log.Factory = "JSON"
-	logger := makeLogger()
+	logger := makeLogger("debug", "json")
 
 	err := errors.WithStack(errors.New("test error"))
 	ctx := NewLoggedCtx()
@@ -55,4 +51,14 @@ func TestUnit_LoggerUtils_ReadWriteCtx_Ok(t *testing.T) { //nolint: paralleltest
 
 	act = ReadValue(ctx, "somethingOther")
 	assert.Empty(t, act)
+}
+
+func TestUnit_LoggerUtils_WithValues(t *testing.T) {
+	t.Parallel()
+
+	ctx := NewLoggedCtx()
+	ctx = WithValue(ctx, "userId", "123", "username", "peter")
+
+	zerolog.Ctx(ctx).Info().Msg("log")
+
 }

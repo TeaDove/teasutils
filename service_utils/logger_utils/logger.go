@@ -22,19 +22,22 @@ func marshalStack(err error) any {
 	return fmt.Sprintf("%+v", err)
 }
 
-func makeLogger() zerolog.Logger {
-	level := must_utils.Must(zerolog.ParseLevel(settings_utils.ServiceSettings.Log.Level))
+func makeLoggerFromSettings() zerolog.Logger {
+	return makeLogger(settings_utils.ServiceSettings.Log.Level, settings_utils.ServiceSettings.Log.Factory)
+}
+func makeLogger(level, factory string) zerolog.Logger {
+	loggerLevel := must_utils.Must(zerolog.ParseLevel(level))
 
 	logger := zerolog.New(os.Stderr).
 		With().
 		Timestamp().
 		Caller().
 		Logger().
-		Level(level)
+		Level(loggerLevel)
 
 	logger.Hook()
 
-	if strings.EqualFold(settings_utils.ServiceSettings.Log.Factory, "CONSOLE") {
+	if strings.EqualFold(factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		//nolint: reassign // TODO find better solution
 		zerolog.ErrorStackMarshaler = printedMarshalStack
@@ -43,10 +46,10 @@ func makeLogger() zerolog.Logger {
 		zerolog.ErrorStackMarshaler = marshalStack
 	}
 
-	logger.Trace().Str("logLevel", level.String()).Msg("logger.initiated")
+	logger.Trace().Str("logLevel", loggerLevel.String()).Msg("logger.initiated")
 
 	return logger
 }
 
 //nolint:gochecknoglobals // need this
-var globalLogger = makeLogger()
+var globalLogger = makeLoggerFromSettings()

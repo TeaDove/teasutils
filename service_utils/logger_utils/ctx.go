@@ -22,8 +22,13 @@ func AddLvlLoggerToCtx(ctx context.Context, lvl zerolog.Level) context.Context {
 	return globalLogger.With().Logger().Level(lvl).WithContext(ctx)
 }
 
-func WithValue(ctx context.Context, key string, value string) context.Context {
-	return zerolog.Ctx(ctx).With().Str(key, value).Ctx(ctx).Logger().WithContext(ctx)
+func WithValue(ctx context.Context, kv ...string) context.Context {
+	logger := zerolog.Ctx(ctx).With()
+	for idx := 0; idx < len(kv)-1; idx += 2 {
+		logger = logger.Str(kv[idx], kv[idx+1])
+	}
+
+	return logger.Ctx(ctx).Logger().WithContext(ctx)
 }
 
 type loggerCtxKey string
