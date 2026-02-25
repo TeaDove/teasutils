@@ -60,5 +60,4 @@ func TestUnit_LoggerUtils_WithValues(t *testing.T) {
 	ctx = WithValue(ctx, "userId", "123", "username", "peter")
 
 	zerolog.Ctx(ctx).Info().Msg("log")
-
 }

@@ -25,6 +25,7 @@ func marshalStack(err error) any {
 func makeLoggerFromSettings() zerolog.Logger {
 	return makeLogger(settings_utils.ServiceSettings.Log.Level, settings_utils.ServiceSettings.Log.Factory)
 }
+
 func makeLogger(level, factory string) zerolog.Logger {
 	loggerLevel := must_utils.Must(zerolog.ParseLevel(level))
 
