@@ -10,13 +10,13 @@ import (
 	"github.com/teadove/teasutils/utils/errors_utils"
 
 	"github.com/cockroachdb/errors"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/service_utils/logger_utils"
 )
 
 func ErrHandler() fiber.ErrorHandler {
-	return func(c *fiber.Ctx, err error) error {
+	return func(c fiber.Ctx, err error) error {
 		code := fiber.StatusInternalServerError
 
 		var e *fiber.Error
@@ -26,13 +26,13 @@ func ErrHandler() fiber.ErrorHandler {
 		}
 
 		if code >= http.StatusInternalServerError {
-			zerolog.Ctx(c.UserContext()).
+			zerolog.Ctx(c.Context()).
 				Error().
 				Stack().Err(errors_utils.WithStackIfRequired(err)).
 				Int("code", code).
 				Msg("http.internal.error")
 		} else {
-			zerolog.Ctx(c.UserContext()).
+			zerolog.Ctx(c.Context()).
 				Warn().
 				Err(err).
 				Int("code", code).
@@ -46,18 +46,18 @@ func ErrHandler() fiber.ErrorHandler {
 }
 
 func MiddlewareLogger() fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(c fiber.Ctx) error {
 		t0 := time.Now()
-		ctx := logger_utils.AddLoggerToCtx(c.UserContext())
+		ctx := logger_utils.AddLoggerToCtx(c.Context())
 		ctx = logger_utils.WithValue(ctx, "ip", c.IP())
 		ctx = logger_utils.WithValue(ctx, "app_method", fmt.Sprintf("%s %s", c.Method(), c.Path()))
 		ctx = logger_utils.WithValue(ctx, "user_agent", strings.Clone(c.Get(fiber.HeaderUserAgent)))
 
-		c.SetUserContext(ctx)
+		c.SetContext(ctx)
 
 		err := c.Next()
 
-		log := zerolog.Ctx(c.UserContext()).
+		log := zerolog.Ctx(c.Context()).
 			Debug().
 			Str("latency", time.Since(t0).String()).
 			Int("code", StatusFromContext(c, err))
@@ -77,11 +77,11 @@ func MiddlewareLogger() fiber.Handler {
 }
 
 func MiddlewareCtxTimeout(dur time.Duration) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		ctx, cancel := context.WithTimeout(c.UserContext(), dur)
+	return func(c fiber.Ctx) error {
+		ctx, cancel := context.WithTimeout(c.Context(), dur)
 		defer cancel()
 
-		c.SetUserContext(ctx)
+		c.SetContext(ctx)
 
 		return c.Next()
 	}

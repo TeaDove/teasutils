@@ -5,7 +5,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/teadove/teasutils/fiber_utils"
 )
 
@@ -14,13 +14,13 @@ func main() {
 	app.Use(fiber_utils.MiddlewareLogger())
 	app.Use(fiber_utils.MiddlewareCtxTimeout(time.Second))
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
-	app.Get("/err", func(_ *fiber.Ctx) error {
+	app.Get("/err", func(_ fiber.Ctx) error {
 		return errors.New("error occurred")
 	})
-	app.Get("/parse-err", func(c *fiber.Ctx) error {
+	app.Get("/parse-err", func(c fiber.Ctx) error {
 		return c.JSON(func() {})
 	})
 

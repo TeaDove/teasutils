@@ -2,10 +2,10 @@ package fiber_utils
 
 import (
 	"github.com/cockroachdb/errors"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func StatusFromContext(c *fiber.Ctx, err error) int {
+func StatusFromContext(c fiber.Ctx, err error) int {
 	if err == nil {
 		return c.Response().StatusCode()
 	}
