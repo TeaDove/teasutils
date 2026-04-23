@@ -35,7 +35,7 @@ func Pprint(values ...any) {
 
 		encoded, err := json.MarshalIndent(value, "", "  ")
 		if err != nil {
-			v.WriteString(fmt.Sprintf("%+v", value))
+			fmt.Fprintf(&v, "%+v", value)
 			continue
 		}
 
