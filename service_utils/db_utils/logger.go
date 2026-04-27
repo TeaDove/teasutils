@@ -11,7 +11,7 @@ import (
 type ZerologAdapter struct{}
 
 func (z ZerologAdapter) LogMode(_ logger.LogLevel) logger.Interface {
-	panic("no implemented")
+	return z
 }
 
 func (z ZerologAdapter) Info(ctx context.Context, s string, i ...interface{}) {

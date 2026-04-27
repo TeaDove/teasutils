@@ -36,8 +36,6 @@ func makeLogger(level, factory string) zerolog.Logger {
 		Logger().
 		Level(loggerLevel)
 
-	logger.Hook()
-
 	if strings.EqualFold(factory, "CONSOLE") {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		//nolint: reassign // TODO find better solution
