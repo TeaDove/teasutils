@@ -39,7 +39,7 @@ func ErrHandler() fiber.ErrorHandler {
 				Msg("http.client.error")
 		}
 
-		c.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
+		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
 
 		return c.Status(code).JSON(fiber.Map{"error": err.Error()})
 	}
