@@ -99,6 +99,8 @@ github.com/teadove/teasutils/utils v0.3.1 h1:tTLbFl+9R3PcRNEsNpd9PSXSTDS+Uq2rBVe
 github.com/teadove/teasutils/utils v0.3.1/go.mod h1:cpIfn7BTxGIbA9osEyev4FhynhqcAaLseTgYmSHmlk8=
 github.com/teadove/teasutils/utils v0.3.4 h1:Uf3hpSx3KhP+dN6RPcC5fdM/4TjrHc3j1pWzpxiV3ww=
 github.com/teadove/teasutils/utils v0.3.4/go.mod h1:cv5kehjenwSJYJ+XppJyIKO9bVtCmsp3irFLsYBIJ7c=
+github.com/teadove/teasutils/utils v1.0.0 h1:PU3eWWW1KN317jaNDSFzwREdJeW/TltDJ/fMWDl7YX8=
+github.com/teadove/teasutils/utils v1.0.0/go.mod h1:W9bvxJ2CcEt3ZFByMO3SiT8sJVfOFAXcnNd7X1doYMg=
 github.com/tinylib/msgp v1.6.3 h1:bCSxiTz386UTgyT1i0MSCvdbWjVW+8sG3PjkGsZQt4s=
 github.com/tinylib/msgp v1.6.3/go.mod h1:RSp0LW9oSxFut3KzESt5Voq4GVWyS+PSulT77roAqEA=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
