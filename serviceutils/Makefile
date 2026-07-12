@@ -1,7 +1,7 @@
 VERSION ?= $(shell cat VERSION)
 
 tag:
-	git tag service_utils/$(VERSION)
+	git tag serviceutils/$(VERSION)
 	git push origin --tags
 
 test:

@@ -1,4 +1,4 @@
-package fiber_utils
+package fiberutils
 
 import (
 	_ "embed"
@@ -7,7 +7,7 @@ import (
 )
 
 ////go:embed openapi.yaml
-//var openapi []byte
+// var openapi []byte
 
 //go:embed swagger.html
 var swagger []byte

@@ -1,4 +1,4 @@
-package settings_utils
+package settingsutils
 
 import (
 	"os"

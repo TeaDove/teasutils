@@ -1,4 +1,4 @@
-package settings_utils
+package settingsutils
 
 import (
 	"os"
@@ -25,7 +25,7 @@ type serviceSettings struct {
 //nolint:gochecknoglobals // need this
 var ServiceSettings serviceSettings
 
-// nolint: gochecknoinits // required here
+//nolint:gochecknoinits // required here
 func init() {
 	ServiceSettings = MustGetSetting[serviceSettings]("SERVICE_")
 	setServiceName(&ServiceSettings)

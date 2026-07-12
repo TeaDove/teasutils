@@ -6,5 +6,5 @@ This package contains some usefull utils for golang
 
 ```shell
 go get -u github.com/teadove/teasutils/utils # general utils
-go get -u github.com/teadove/teasutils/fiber-utils # fiber specific utils
+go get -u github.com/teadove/teasutils/fiberutils # fiber specific utils
 ``` 

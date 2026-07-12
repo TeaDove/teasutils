@@ -1,13 +1,13 @@
-package logger_utils
+package loggerutils
 
 import (
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/teadove/teasutils/service_utils/settings_utils"
+	"github.com/teadove/teasutils/serviceutils/settingsutils"
 
-	"github.com/teadove/teasutils/utils/must_utils"
+	"github.com/teadove/teasutils/utils/mustutils"
 
 	"github.com/rs/zerolog"
 )
@@ -23,11 +23,11 @@ func marshalStack(err error) any {
 }
 
 func makeLoggerFromSettings() zerolog.Logger {
-	return makeLogger(settings_utils.ServiceSettings.Log.Level, settings_utils.ServiceSettings.Log.Factory)
+	return makeLogger(settingsutils.ServiceSettings.Log.Level, settingsutils.ServiceSettings.Log.Factory)
 }
 
 func makeLogger(level, factory string) zerolog.Logger {
-	loggerLevel := must_utils.Must(zerolog.ParseLevel(level))
+	loggerLevel := mustutils.Must(zerolog.ParseLevel(level))
 
 	logger := zerolog.New(os.Stderr).
 		With().

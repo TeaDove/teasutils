@@ -6,13 +6,13 @@ import (
 	"github.com/cockroachdb/errors"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/teadove/teasutils/fiber_utils"
+	"github.com/teadove/teasutils/fiberutils"
 )
 
 func main() {
-	app := fiber.New(fiber.Config{Immutable: true, ErrorHandler: fiber_utils.ErrHandler()})
-	app.Use(fiber_utils.MiddlewareLogger())
-	app.Use(fiber_utils.MiddlewareCtxTimeout(time.Second))
+	app := fiber.New(fiber.Config{Immutable: true, ErrorHandler: fiberutils.ErrHandler()})
+	app.Use(fiberutils.MiddlewareLogger())
+	app.Use(fiberutils.MiddlewareCtxTimeout(time.Second))
 
 	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello, World!")

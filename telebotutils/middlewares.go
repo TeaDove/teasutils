@@ -1,4 +1,4 @@
-package telebot_utils
+package telebotutils
 
 import (
 	"fmt"

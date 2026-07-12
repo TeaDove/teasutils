@@ -1,4 +1,4 @@
-package settings_utils
+package settingsutils
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"github.com/caarlos0/env/v11"
 	"github.com/cockroachdb/errors"
 	"github.com/joho/godotenv"
-	"github.com/teadove/teasutils/utils/must_utils"
+	"github.com/teadove/teasutils/utils/mustutils"
 )
 
 // GetSettings
@@ -22,7 +22,7 @@ import (
 //	 }
 //
 //	 func init() {
-//		  Settings = settings_utils.MustGetSetting[serviceSettings]("TEAS_")
+//		  Settings = settingsutils.MustGetSetting[serviceSettings]("TEAS_")
 //	 }
 //
 //	 var Settings serviceSettings
@@ -38,7 +38,7 @@ func GetSettings[T any](envPrefix string) (T, error) {
 }
 
 func MustGetSetting[T any](envPrefix string) T {
-	return must_utils.Must(GetSettings[T](envPrefix))
+	return mustutils.Must(GetSettings[T](envPrefix))
 }
 
 func loadSettingsWithDotenv[T any](envPrefix string) (T, error) {

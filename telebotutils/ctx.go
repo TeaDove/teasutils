@@ -1,11 +1,11 @@
-package telebot_utils
+package telebotutils
 
 import (
 	"context"
 
 	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/service_utils/logger_utils"
-	"github.com/teadove/teasutils/utils/redact_utils"
+	"github.com/teadove/teasutils/serviceutils/loggerutils"
+	"github.com/teadove/teasutils/utils/redactutils"
 	tele "gopkg.in/telebot.v4"
 )
 
@@ -17,17 +17,17 @@ func GetOrSetCtx(c tele.Context) context.Context {
 		return ctx
 	}
 
-	ctx = logger_utils.NewLoggedCtx()
+	ctx = loggerutils.NewLoggedCtx()
 	if c.Chat() != nil && c.Chat().Title != "" {
-		ctx = logger_utils.WithValue(ctx, "in", c.Chat().Title)
+		ctx = loggerutils.WithValue(ctx, "in", c.Chat().Title)
 	}
 
 	if c.Text() != "" {
-		ctx = logger_utils.WithValue(ctx, "text", redact_utils.Trim(c.Text()))
+		ctx = loggerutils.WithValue(ctx, "text", redactutils.Trim(c.Text()))
 	}
 
 	if c.Sender() != nil {
-		ctx = logger_utils.WithValue(ctx, "from", c.Sender().Username)
+		ctx = loggerutils.WithValue(ctx, "from", c.Sender().Username)
 	}
 
 	c.Set("ctx", ctx)

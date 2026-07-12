@@ -1,4 +1,4 @@
-package logger_utils
+package loggerutils
 
 import (
 	"context"

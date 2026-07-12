@@ -1,4 +1,4 @@
-package fiber_utils
+package fiberutils
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/teadove/teasutils/utils/errors_utils"
+	"github.com/teadove/teasutils/utils/errorsutils"
 
 	"github.com/cockroachdb/errors"
 	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog"
-	"github.com/teadove/teasutils/service_utils/logger_utils"
+	"github.com/teadove/teasutils/serviceutils/loggerutils"
 )
 
 func ErrHandler() fiber.ErrorHandler {
@@ -28,7 +28,7 @@ func ErrHandler() fiber.ErrorHandler {
 		if code >= http.StatusInternalServerError {
 			zerolog.Ctx(c.Context()).
 				Error().
-				Stack().Err(errors_utils.WithStackIfRequired(err)).
+				Stack().Err(errorsutils.WithStackIfRequired(err)).
 				Int("code", code).
 				Msg("http.internal.error")
 		} else {
@@ -48,10 +48,10 @@ func ErrHandler() fiber.ErrorHandler {
 func MiddlewareLogger() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		t0 := time.Now()
-		ctx := logger_utils.AddLoggerToCtx(c.Context())
-		ctx = logger_utils.WithValue(ctx, "ip", c.IP())
-		ctx = logger_utils.WithValue(ctx, "app_method", fmt.Sprintf("%s %s", c.Method(), c.Path()))
-		ctx = logger_utils.WithValue(ctx, "user_agent", strings.Clone(c.Get(fiber.HeaderUserAgent)))
+		ctx := loggerutils.AddLoggerToCtx(c.Context())
+		ctx = loggerutils.WithValue(ctx, "ip", c.IP())
+		ctx = loggerutils.WithValue(ctx, "app_method", fmt.Sprintf("%s %s", c.Method(), c.Path()))
+		ctx = loggerutils.WithValue(ctx, "user_agent", strings.Clone(c.Get(fiber.HeaderUserAgent)))
 
 		c.SetContext(ctx)
 

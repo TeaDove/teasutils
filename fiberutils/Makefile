@@ -1,7 +1,7 @@
 VERSION ?= $(shell cat VERSION)
 
 tag:
-	git tag fiber_utils/$(VERSION)
+	git tag fiberutils/$(VERSION)
 	git push origin --tags
 
 test:

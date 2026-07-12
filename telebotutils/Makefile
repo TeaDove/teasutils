@@ -1,7 +1,7 @@
 VERSION ?= $(shell cat VERSION)
 
 tag:
-	git tag telebot_utils/$(VERSION)
+	git tag telebotutils/$(VERSION)
 	git push origin --tags
 
 test:
