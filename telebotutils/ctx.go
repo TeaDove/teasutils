@@ -35,6 +35,8 @@ func GetOrSetCtx(c tele.Context) context.Context {
 	return ctx
 }
 
+// Log returns the request-scoped logger for the update, initialising the
+// context via GetOrSetCtx if needed.
 func Log(c tele.Context) *zerolog.Logger {
 	return zerolog.Ctx(GetOrSetCtx(c))
 }
