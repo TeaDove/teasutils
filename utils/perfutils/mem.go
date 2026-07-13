@@ -11,6 +11,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// LogMemUsage logs a one-off snapshot of runtime memory and GC statistics
+// at info level using the ctx logger.
 func LogMemUsage(ctx context.Context) {
 	samples := make([]metrics.Sample, 1)
 	samples[0].Name = "/memory/classes/total:bytes"
@@ -38,6 +40,8 @@ func LogMemUsage(ctx context.Context) {
 		Msg("perfstats")
 }
 
+// SpamLogMemUsage calls LogMemUsage every d until ctx is cancelled.
+// It blocks, so run it in its own goroutine.
 func SpamLogMemUsage(ctx context.Context, d time.Duration) {
 	t := time.NewTicker(d)
 

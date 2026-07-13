@@ -73,6 +73,16 @@ func TestRoundDuration(t *testing.T) {
 			duration: 512*time.Microsecond + 51*time.Nanosecond,
 			want:     "512.051µ",
 		},
+		{
+			name:     "whole microseconds",
+			duration: 512 * time.Microsecond,
+			want:     "512µ",
+		},
+		{
+			name:     "single microsecond",
+			duration: 1 * time.Microsecond,
+			want:     "1µ",
+		},
 	}
 
 	for _, tt := range tests {

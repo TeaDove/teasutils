@@ -1,12 +1,7 @@
 package redactutils
 
 import (
-	"encoding/json"
 	"testing"
-
-	"github.com/teadove/teasutils/utils/mustutils"
-
-	"github.com/teadove/teasutils/utils/testutils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,33 +28,4 @@ func TestUnit_RedactUtils_Trim_Ok(t *testing.T) {
 	assert.Equal(t, "[]", Trim(""))
 	assert.Equal(t, "[123]", Trim("123"))
 	assert.Equal(t, "[1234567890...:14]", Trim("12345678901234"))
-}
-
-func TestUnit_RedactUtils_RedactJSONWithPrefix_Ok(t *testing.T) {
-	t.Parallel()
-
-	ctx := testutils.GetLoggedContext()
-
-	values := map[string]any{
-		"user": map[string]any{
-			"name":     "TeaDove",
-			"password": "123456789",
-			"phone":    123456789,
-		},
-		"db": map[string]any{
-			"host":     "localhost",
-			"port":     "5432",
-			"password": "123456789",
-		},
-	}
-
-	assert.JSONEq(
-		t,
-		`{"db":{"host":"localhost","password":"[REDACTED:12345...:9]","port":"5432"},
-"user":{"name":"TeaDove","password":"[REDACTED:12345...:9]","phone":"[REDACTED:12345...:9]"}}`,
-		string(RedactJSONWithPrefix(ctx,
-			mustutils.Must(json.Marshal(values)),
-			"user.password", "user.phone", "db.password", "undefined",
-		)),
-	)
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
+// AESEncrypt encrypts plaintext with AES-GCM and returns nonce||ciphertext.
+// key must be a valid AES key (16, 24 or 32 bytes); pair with AESDecrypt.
 func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -33,6 +35,8 @@ func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 	return result, nil
 }
 
+// AESDecrypt reverses AESEncrypt: it expects nonce||ciphertext produced with
+// the same key and returns the plaintext, erroring on a short or tampered input.
 func AESDecrypt(encrypted []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {

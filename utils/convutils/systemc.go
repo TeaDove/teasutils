@@ -19,32 +19,39 @@ func round(num float64) int {
 	return int(num + math.Copysign(0.5, num))
 }
 
+// ToFixed rounds num to precision decimal places.
 func ToFixed(num float64, precision int) float64 {
 	//nolint: mnd // its just 10...
 	output := math.Pow(10, float64(precision))
 	return float64(round(num*output)) / output
 }
 
+// ToKilo divides by 1000 (decimal kilo).
 func ToKilo[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / thousand
 }
 
+// ToKiloByte divides by 1024 (binary kibi).
 func ToKiloByte[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / binaryThousand
 }
 
+// ToMega divides by 1000^2 (decimal mega).
 func ToMega[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / thousand / thousand
 }
 
+// ToMegaByte divides by 1024^2 (binary mebi).
 func ToMegaByte[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / binaryThousand / binaryThousand
 }
 
+// ToGiga divides by 1000^3 (decimal giga).
 func ToGiga[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / thousand / thousand / thousand
 }
 
+// ToGigaByte divides by 1024^3 (binary gibi).
 func ToGigaByte[T constraints.Integer | constraints.Float](bytes T) float64 {
 	return float64(bytes) / binaryThousand / binaryThousand / binaryThousand
 }
@@ -72,6 +79,9 @@ func closestByteAndK(v float64) (float64, uint) {
 	return v / binaryThousand / binaryThousand / binaryThousand / binaryThousand, 4 // TB
 }
 
+// ClosestByteWithPrecision formats bytes with the largest fitting binary unit
+// (B, kB, MB, GB, TB) and precision decimals, e.g. "1.5 MB". Intended for
+// non-negative sizes.
 func ClosestByteWithPrecision[T constraints.Integer | constraints.Float](bytes T, precision int) string {
 	rounded, pow := closestByteAndK(float64(bytes))
 
@@ -100,6 +110,7 @@ func ClosestByteWithPrecision[T constraints.Integer | constraints.Float](bytes T
 	)
 }
 
+// ClosestByte is ClosestByteWithPrecision with the default precision (2).
 func ClosestByte[T constraints.Integer | constraints.Float](bytes T) string {
 	return ClosestByteWithPrecision(bytes, defaultPrecision)
 }
@@ -139,6 +150,9 @@ func closestK(v float64) (float64, int) {
 	return v / thousand / thousand / thousand / thousand, 4 // TB
 }
 
+// ClosestKWithPrecision formats v with the closest decimal SI prefix, from
+// nano ("n") up to tera ("T"), with precision decimals, e.g. "1.5 k".
+// Intended for non-negative magnitudes.
 func ClosestKWithPrecision[T constraints.Integer | constraints.Float](v T, precision int) string {
 	rounded, pow := closestK(float64(v))
 
@@ -173,6 +187,7 @@ func ClosestKWithPrecision[T constraints.Integer | constraints.Float](v T, preci
 	)
 }
 
+// Closest is ClosestKWithPrecision with the default precision (2).
 func Closest[T constraints.Integer | constraints.Float](v T) string {
 	return ClosestKWithPrecision(v, defaultPrecision)
 }

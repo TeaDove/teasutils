@@ -17,7 +17,7 @@ func RoundDuration(d time.Duration) string {
 
 	if d.Microseconds() < thousand {
 		if int(d.Nanoseconds())%thousand == 0 {
-			return fmt.Sprintf("%dms", int(d.Microseconds()))
+			return fmt.Sprintf("%dµ", int(d.Microseconds()))
 		}
 
 		return fmt.Sprintf("%d.%03dµ", int(d.Microseconds()), int(d.Nanoseconds())%thousand)

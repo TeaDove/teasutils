@@ -17,7 +17,7 @@ func TestAES(t *testing.T) {
 	encrypted, err := AESEncrypt([]byte(msg), key)
 	require.NoError(t, err)
 
-	testutils.Pprint(encrypted)
+	testutils.Debug(encrypted)
 
 	decrypted, err := AESDecrypt(encrypted, key)
 	require.NoError(t, err)

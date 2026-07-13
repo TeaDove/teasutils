@@ -1,7 +1,8 @@
 package slicesutils
 
-// CutInBatches
-// Cuts slice in batches, remaining will be put in extra batch.
+// CutInBatches splits slice into consecutive batches of batchSize, with any
+// remainder in a final shorter batch. Batches share the input's backing array
+// (they are sub-slices, not copies). It panics if batchSize <= 0.
 func CutInBatches[T any](slice []T, batchSize int) [][]T {
 	if batchSize <= 0 {
 		panic("batch size must be greater than zero")

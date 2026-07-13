@@ -19,6 +19,6 @@ func failingFunction(_ context.Context) error {
 func TestDoOrLog(t *testing.T) {
 	t.Parallel()
 
-	WithRecoverAndLog(panicingFunction)(testutils.GetLoggedContext())
-	WithRecoverAndLog(failingFunction)(testutils.GetLoggedContext())
+	WithRecoverAndLog(panicingFunction)(testutils.Context())
+	WithRecoverAndLog(failingFunction)(testutils.Context())
 }

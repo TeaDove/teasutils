@@ -6,6 +6,8 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
+// AnyToErr converts a recovered panic value into an error: nil stays nil,
+// an error is wrapped as "panicked", and anything else is formatted into one.
 func AnyToErr(v any) error {
 	if v == nil {
 		return nil

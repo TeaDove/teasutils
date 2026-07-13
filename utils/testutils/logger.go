@@ -12,7 +12,9 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func GetLoggedContext() context.Context {
+// Context returns a background context carrying a debug-level zerolog console
+// logger. Intended for tests that exercise code reading the logger from ctx.
+func Context() context.Context {
 	logger := zerolog.New(os.Stderr).
 		With().
 		Timestamp().
@@ -24,18 +26,19 @@ func GetLoggedContext() context.Context {
 	return logger.With().Logger().WithContext(context.Background())
 }
 
-// Pprint
-//
-// Prints everything with types, only for debug purposes.
-func Pprint(values ...any) {
+// Debug pretty-prints each value with its type as indented JSON to stdout.
+// For quick debugging only; not for production logging.
+func Debug(values ...any) {
 	var v strings.Builder
-	for _, value := range values {
-		v.WriteString(color.RedString(fmt.Sprintf("%T", value)))
-		v.WriteString(": ")
+	v.WriteString("------\n")
+
+	for idx, value := range values {
+		fmt.Fprintf(&v, "%d (%s): ", idx, color.RedString(fmt.Sprintf("%T", value)))
 
 		encoded, err := json.MarshalIndent(value, "", "  ")
 		if err != nil {
 			fmt.Fprintf(&v, "%+v", value)
+
 			continue
 		}
 
@@ -43,5 +46,6 @@ func Pprint(values ...any) {
 		v.WriteByte('\n')
 	}
 
+	v.WriteString("\n------")
 	println(v.String()) //nolint: forbidigo // required
 }
