@@ -8,7 +8,7 @@ require (
 	github.com/gofiber/fiber/v3 v3.4.0
 	github.com/rs/zerolog v1.35.1
 	github.com/teadove/teasutils/serviceutils v1.0.0
-	github.com/teadove/teasutils/utils v1.0.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -34,6 +34,7 @@ require (
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.15.0 // indirect
+	github.com/teadove/teasutils/utils v1.0.0 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.72.0 // indirect

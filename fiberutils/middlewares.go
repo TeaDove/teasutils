@@ -7,14 +7,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/teadove/teasutils/utils/errorsutils"
-
 	"github.com/cockroachdb/errors"
 	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/serviceutils/loggerutils"
 )
 
+// ErrHandler returns a fiber error handler that logs the error (at error level
+// with a stack for 5xx, warn for 4xx) and writes a JSON {"error": ...} body
+// with the resolved status code.
 func ErrHandler() fiber.ErrorHandler {
 	return func(c fiber.Ctx, err error) error {
 		code := fiber.StatusInternalServerError
@@ -28,7 +29,7 @@ func ErrHandler() fiber.ErrorHandler {
 		if code >= http.StatusInternalServerError {
 			zerolog.Ctx(c.Context()).
 				Error().
-				Stack().Err(errorsutils.WithStackIfRequired(err)).
+				Stack().Err(err).
 				Int("code", code).
 				Msg("http.internal.error")
 		} else {
@@ -45,6 +46,9 @@ func ErrHandler() fiber.ErrorHandler {
 	}
 }
 
+// MiddlewareLogger injects a request-scoped logger (with ip, method+path and
+// user-agent fields) into the context and logs one debug line per request with
+// latency, status code and request/response sizes.
 func MiddlewareLogger() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		t0 := time.Now()
@@ -76,6 +80,8 @@ func MiddlewareLogger() fiber.Handler {
 	}
 }
 
+// MiddlewareCtxTimeout bounds each request's context with a dur timeout,
+// so downstream handlers and DB calls are cancelled when it elapses.
 func MiddlewareCtxTimeout(dur time.Duration) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		ctx, cancel := context.WithTimeout(c.Context(), dur)
