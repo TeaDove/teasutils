@@ -37,6 +37,8 @@ func GetSettings[T any](envPrefix string) (T, error) {
 	return settings, nil
 }
 
+// MustGetSetting is like GetSettings but panics on error; use it at startup
+// (e.g. in package init) where invalid configuration should abort the process.
 func MustGetSetting[T any](envPrefix string) T {
 	return mustutils.Must(GetSettings[T](envPrefix))
 }

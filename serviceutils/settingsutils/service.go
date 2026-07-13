@@ -22,6 +22,9 @@ type serviceSettings struct {
 	Log logSettings `envPrefix:"LOG__"`
 }
 
+// ServiceSettings holds the process-wide service configuration, populated
+// from SERVICE_-prefixed environment variables during package init.
+//
 //nolint:gochecknoglobals // need this
 var ServiceSettings serviceSettings
 
