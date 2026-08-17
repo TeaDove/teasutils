@@ -22,10 +22,6 @@ func marshalStack(err error) any {
 	return fmt.Sprintf("%+v", err)
 }
 
-func makeLoggerFromSettings() zerolog.Logger {
-	return makeLogger(settingsutils.ServiceSettings.Log.Level, settingsutils.ServiceSettings.Log.Factory)
-}
-
 func makeLogger(level, factory string) zerolog.Logger {
 	loggerLevel := mustutils.Must(zerolog.ParseLevel(level))
 
@@ -48,6 +44,10 @@ func makeLogger(level, factory string) zerolog.Logger {
 	logger.Trace().Str("logLevel", loggerLevel.String()).Msg("logger.initiated")
 
 	return logger
+}
+
+func makeLoggerFromSettings() zerolog.Logger {
+	return makeLogger(settingsutils.ServiceSettings.Log.Level, settingsutils.ServiceSettings.Log.Factory)
 }
 
 //nolint:gochecknoglobals // need this
