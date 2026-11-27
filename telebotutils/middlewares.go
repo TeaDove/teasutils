@@ -1,83 +1,86 @@
 package telebotutils
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/cockroachdb/errors"
 	"github.com/rs/zerolog"
 	tele "gopkg.in/telebot.v4"
 )
 
-// LogOnErr logs err at error level (with a stack) against the update's
-// context. Suitable as a telebot OnError handler that only logs.
-func LogOnErr(err error, c tele.Context) {
-	zerolog.Ctx(GetOrSetCtx(c)).
-		Error().
-		Stack().Err(err).
-		Msg("failed.to.process.tg.update")
-}
+func LogOnErr(parent context.Context) func(error, tele.Context) {
+	getContext := GetOrSetCtx(parent)
 
-// ReportOnErr logs err and, for errors whose code is >= 400, replies the error
-// text to the user. Non-Error values are treated as 500. Use NewClientError /
-// NewServerError to control the code carried by err.
-func ReportOnErr(err error, c tele.Context) {
-	err = errors.Wrap(err, "failed to process update")
-
-	var teleErr Error
-
-	if !errors.As(err, &teleErr) {
-		teleErr = Error{
-			code: http.StatusInternalServerError,
-			err:  err,
-		}
-	}
-
-	if teleErr.code >= http.StatusBadRequest {
-		zerolog.Ctx(GetOrSetCtx(c)).
-			Warn().
-			Err(err).
-			Msg("failed.to.process.tg.update")
-
-		innerErr := c.Reply(err.Error(), tele.ModeDefault)
-		if innerErr != nil {
-			zerolog.Ctx(GetOrSetCtx(c)).
-				Error().
-				Stack().Err(err).
-				Msg("failed.to.reply")
-		}
-	} else {
-		zerolog.Ctx(GetOrSetCtx(c)).
+	return func(err error, c tele.Context) {
+		zerolog.Ctx(getContext(c)).
 			Error().
-			Stack().Err(err).
+			Stack().
+			Err(withoutRequestURL(err)).
 			Msg("failed.to.process.tg.update")
 	}
 }
 
-// Error is a telebot handler error carrying an HTTP-like status code that
-// ReportOnErr uses to decide how to log and whether to reply to the user.
+func ReportOnErr(parent context.Context) func(error, tele.Context) {
+	logError := LogOnErr(parent)
+	getContext := GetOrSetCtx(parent)
+
+	return func(err error, c tele.Context) {
+		logError(err, c)
+
+		ctx := getContext(c)
+		if c == nil || c.Chat() == nil || ctx.Err() != nil {
+			return
+		}
+
+		message := "An internal error occurred."
+
+		var handlerError Error
+		if errors.As(err, &handlerError) && handlerError.code == http.StatusBadRequest {
+			message = handlerError.err.Error()
+		}
+
+		replyErr := c.Reply(message, tele.ModeDefault)
+		if replyErr != nil {
+			zerolog.Ctx(ctx).Error().Err(withoutRequestURL(replyErr)).Msg("failed.to.reply")
+		}
+	}
+}
+
+func IsClientError(err error) bool {
+	var handlerError Error
+
+	return errors.As(err, &handlerError) && handlerError.code == http.StatusBadRequest
+}
+
+func withoutRequestURL(err error) error {
+	var requestErr *url.Error
+	if errors.As(err, &requestErr) {
+		return requestErr.Err
+	}
+
+	return err
+}
+
 type Error struct {
 	code int
 	err  error
 }
 
-// Error implements the error interface, rendering the code and wrapped error.
 func (e Error) Error() string {
 	return fmt.Sprintf("code=%d, err=%v", e.code, e.err)
 }
 
-// NewClientError wraps err as a client-side Error (code 400).
-func NewClientError(err error) Error {
-	return Error{
-		code: http.StatusBadRequest,
-		err:  err,
-	}
+func (e Error) Unwrap() error {
+	return e.err
 }
 
-// NewServerError wraps err as a server-side Error (code 500).
+func NewClientError(err error) Error {
+	return Error{code: http.StatusBadRequest, err: err}
+}
+
 func NewServerError(err error) Error {
-	return Error{
-		code: http.StatusInternalServerError,
-		err:  err,
-	}
+	return Error{code: http.StatusInternalServerError, err: err}
 }
