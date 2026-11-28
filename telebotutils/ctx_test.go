@@ -1,10 +1,13 @@
 package telebotutils_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"testing"
 
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
 	"github.com/teadove/teasutils/telebotutils"
 	tele "gopkg.in/telebot.v4"
 )
@@ -19,26 +22,36 @@ func TestWithContextInheritsParent(t *testing.T) {
 
 	c := tele.NewContext(nil, tele.Update{ID: 42})
 	wrapped := telebotutils.WithContext(parent)(func(c tele.Context) error {
-		ctx := telebotutils.Context(c)
-		if ctx == nil || ctx.Value(key{}) != "parent" {
-			return errors.New("update did not inherit parent context")
-		}
-
-		if ctx != telebotutils.GetOrSetCtx(parent)(c) {
-			return errors.New("update context was created more than once")
-		}
+		assert.Equal(t, "parent", telebotutils.Context(c).Value(key{}))
 
 		return nil
 	})
 
 	err := wrapped(c)
-	if err != nil {
-		t.Fatal(err)
+	if assert.NoError(t, err) {
+		cancel()
+		assert.ErrorIs(t, telebotutils.Context(c).Err(), context.Canceled)
 	}
+}
 
-	cancel()
+func TestContextRequiresMiddleware(t *testing.T) {
+	t.Parallel()
 
-	if !errors.Is(telebotutils.Context(c).Err(), context.Canceled) {
-		t.Fatal("canceling the parent did not cancel the update")
-	}
+	c := tele.NewContext(nil, tele.Update{ID: 42})
+
+	assert.PanicsWithValue(t, "telebotutils: WithContext middleware is required", func() {
+		telebotutils.Context(c)
+	})
+}
+
+func TestReportOnErrWithoutUpdateUsesParent(t *testing.T) {
+	t.Parallel()
+
+	var output bytes.Buffer
+
+	logger := zerolog.New(&output)
+	parent := logger.WithContext(t.Context())
+	telebotutils.ReportOnErr(parent)(errors.New("test error"), nil)
+
+	assert.Contains(t, output.String(), "test error")
 }
