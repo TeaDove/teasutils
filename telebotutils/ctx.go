@@ -2,41 +2,43 @@ package telebotutils
 
 import (
 	"context"
+	"strconv"
 
-	"github.com/rs/zerolog"
 	"github.com/teadove/teasutils/serviceutils/loggerutils"
-	"github.com/teadove/teasutils/utils/redactutils"
 	tele "gopkg.in/telebot.v4"
 )
 
-// GetOrSetCtx
-// Gets context.Context from tele.Context, if nil - creates it and populates with update metadata.
-func GetOrSetCtx(c tele.Context) context.Context {
-	ctx, ok := c.Get("ctx").(context.Context)
-	if ok {
-		return ctx
-	}
+const contextKey = "telebotutils.context"
 
-	ctx = loggerutils.NewLoggedCtx()
-	if c.Chat() != nil && c.Chat().Title != "" {
-		ctx = loggerutils.WithValue(ctx, "in", c.Chat().Title)
+// Context returns the update context installed by WithContext.
+// It panics if the handler is running without that middleware.
+func Context(c tele.Context) context.Context {
+	ctx := storedContext(c)
+	if ctx == nil {
+		panic("telebotutils: WithContext middleware is required")
 	}
-
-	if c.Text() != "" {
-		ctx = loggerutils.WithValue(ctx, "text", redactutils.Trim(c.Text()))
-	}
-
-	if c.Sender() != nil {
-		ctx = loggerutils.WithValue(ctx, "from", c.Sender().Username)
-	}
-
-	c.Set("ctx", ctx)
 
 	return ctx
 }
 
-// Log returns the request-scoped logger for the update, initialising the
-// context via GetOrSetCtx if needed.
-func Log(c tele.Context) *zerolog.Logger {
-	return zerolog.Ctx(GetOrSetCtx(c))
+// WithContext derives an update context from parent and adds the update ID to its logger.
+func WithContext(parent context.Context) tele.MiddlewareFunc {
+	return func(next tele.HandlerFunc) tele.HandlerFunc {
+		return func(c tele.Context) error {
+			ctx := loggerutils.WithValue(parent, "update_id", strconv.Itoa(c.Update().ID))
+			c.Set(contextKey, ctx)
+
+			return next(c)
+		}
+	}
+}
+
+func storedContext(c tele.Context) context.Context {
+	if c == nil {
+		return nil
+	}
+
+	ctx, _ := c.Get(contextKey).(context.Context)
+
+	return ctx
 }
